@@ -181,7 +181,8 @@ class CarState(CarStateBase):
       if self.CP.openpilotLongitudinalControl:
         ret.accFaulted = ret.accFaulted or cp.vl["PCM_CRUISE_2"]["LOW_SPEED_LOCKOUT"] == 2
 
-    self.pcm_acc_status = cp.vl["PCM_CRUISE"]["CRUISE_STATE"]
+    #self.pcm_acc_status = cp.vl["PCM_CRUISE"]["CRUISE_STATE"]
+    self.pcm_acc_status = 8
     if self.CP.carFingerprint not in (NO_STOP_TIMER_CAR - TSS2_CAR):
       # ignore standstill state in certain vehicles, since pcm allows to restart with just an acceleration request
       ret.cruiseState.standstill = self.pcm_acc_status == 7
