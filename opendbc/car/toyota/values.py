@@ -398,7 +398,7 @@ class CAR(Platforms):
     [ToyotaCarDocs("Lexus LS")],
     CarSpecs(mass=4707. * CV.LB_TO_KG, wheelbase=3.09, steerRatio=15.0, tireStiffnessFactor=0.8),
     dbc_dict('lexus_ls_new_mc_pt_generated', 'lexus_ls_adas'),
-    flags=ToyotaFlags.UNSUPPORTED_DSU,
+    #flags=ToyotaFlags.UNSUPPORTED_DSU,
   )
 
 
