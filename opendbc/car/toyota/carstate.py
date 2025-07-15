@@ -79,10 +79,13 @@ class CarState(CarStateBase):
       ret.gasPressed = cp.vl["GAS_PEDAL"]["GAS_PEDAL_USER"] > 0
       can_gear = int(cp.vl["GEAR_PACKET_HYBRID"]["GEAR"])
     else:
-      ret.gasPressed = cp.vl["PCM_CRUISE"]["GAS_RELEASED"] == 0  # TODO: these also have GAS_PEDAL, come back and unify
-      can_gear = int(cp.vl["GEAR_PACKET"]["GEAR"])
-      if not self.CP.enableDsu and not self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
-        ret.stockAeb = bool(cp_acc.vl["PRE_COLLISION"]["PRECOLLISION_ACTIVE"] and cp_acc.vl["PRE_COLLISION"]["FORCE"] < -1e-5)
+      #ret.gasPressed = cp.vl["PCM_CRUISE"]["GAS_RELEASED"] == 0  # TODO: these also have GAS_PEDAL, come back and unify
+       #Lexus LS Gas Pedal
+      ret.gas = cp_drv.vl["GAS_PEDAL"]["GAS_PEDAL"]
+      ret.gasPressed = ret.gas > 1000  #pedal is really sensitive
+      can_gear = int(cp_drv.vl["GEAR_PACKET"]["GEAR"])
+      # if not self.CP.enableDsu and not self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
+      #   ret.stockAeb = bool(cp_acc.vl["PRE_COLLISION"]["PRECOLLISION_ACTIVE"] and cp_acc.vl["PRE_COLLISION"]["FORCE"] < -1e-5)
       if self.CP.carFingerprint != CAR.TOYOTA_MIRAI:
         ret.engineRpm = cp.vl["ENGINE_RPM"]["RPM"]
 
@@ -95,15 +98,15 @@ class CarState(CarStateBase):
     
         #Lexus LS Wheels Speed on two different CAN Msgs
     ret.wheelSpeeds = self.get_wheel_speeds(
-      cp_cam.vl["WHEEL_SPEED_1"]["WHEEL_SPEED_FL"],
-      cp_cam.vl["WHEEL_SPEED_1"]["WHEEL_SPEED_FR"],
-      cp_cam.vl["WHEEL_SPEED_2"]["WHEEL_SPEED_RL"],
-      cp_cam.vl["WHEEL_SPEED_2"]["WHEEL_SPEED_RR"],)
+      cp_drv.vl["WHEEL_SPEED_1"]["WHEEL_SPEED_FL"],
+      cp_drv.vl["WHEEL_SPEED_1"]["WHEEL_SPEED_FR"],
+      cp_drv.vl["WHEEL_SPEED_2"]["WHEEL_SPEED_RL"],
+      cp_drv.vl["WHEEL_SPEED_2"]["WHEEL_SPEED_RR"],)
     ret.vEgoRaw = float(np.mean([ret.wheelSpeeds.fl, ret.wheelSpeeds.fr, ret.wheelSpeeds.rl, ret.wheelSpeeds.rr]))
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
     ret.vEgoCluster = ret.vEgo * 1.015  # minimum of all the cars
 
-    ret.standstill = abs(ret.vEgoRaw) < 1e-3
+    ret.standstill = False #abs(ret.vEgoRaw) < 1e-3
 
     #ret.steeringAngleDeg = cp.vl["STEER_ANGLE_SENSOR"]["STEER_ANGLE"] + cp.vl["STEER_ANGLE_SENSOR"]["STEER_FRACTION"]
     ret.steeringRateDeg = 0 #cp.vl["STEER_ANGLE_SENSOR"]["STEER_RATE"]
@@ -152,9 +155,11 @@ class CarState(CarStateBase):
     else:
       ret.accFaulted = cp.vl["PCM_CRUISE_2"]["ACC_FAULTED"] != 0
       ret.carFaultedNonCritical = cp.vl["PCM_CRUISE_SM"]["TEMP_ACC_FAULTED"] != 0
-      ret.cruiseState.available = cp.vl["PCM_CRUISE_2"]["MAIN_ON"] != 0
-      ret.cruiseState.speed = cp.vl["PCM_CRUISE_2"]["SET_SPEED"] * CV.KPH_TO_MS
-      cluster_set_speed = cp.vl["PCM_CRUISE_SM"]["UI_SET_SPEED"]
+      #ret.cruiseState.available = cp.vl["PCM_CRUISE_2"]["MAIN_ON"] != 0
+      ret.cruiseState.available = cp_bdy.vl["PCM_CRUISE"]["RADAR_READY"] != 0
+      #ret.cruiseState.speed = cp.vl["PCM_CRUISE_2"]["SET_SPEED"] * CV.KPH_TO_MS
+      ret.cruiseState.speed = cp_bdy.vl["PCM_CRUISE"]["UI_SET_SPEED"] * CV.MPH_TO_MS ##################################
+      cluster_set_speed = 0 #cp.vl["PCM_CRUISE_SM"]["UI_SET_SPEED"]
 
     # UI_SET_SPEED is always non-zero when main is on, hide until first enable
     if ret.cruiseState.speed != 0:
@@ -185,12 +190,12 @@ class CarState(CarStateBase):
     ret.genericToggle = bool(cp.vl["LIGHT_STALK"]["AUTO_HIGH_BEAM"])
     ret.espDisabled = cp.vl["ESP_CONTROL"]["TC_DISABLED"] != 0
 
-    if self.CP.enableBsm:
-      ret.leftBlindspot = (cp.vl["BSM"]["L_ADJACENT"] == 1) or (cp.vl["BSM"]["L_APPROACHING"] == 1)
-      ret.rightBlindspot = (cp.vl["BSM"]["R_ADJACENT"] == 1) or (cp.vl["BSM"]["R_APPROACHING"] == 1)
+    # if self.CP.enableBsm:
+    #   ret.leftBlindspot = (cp.vl["BSM"]["L_ADJACENT"] == 1) or (cp.vl["BSM"]["L_APPROACHING"] == 1)
+    #   ret.rightBlindspot = (cp.vl["BSM"]["R_ADJACENT"] == 1) or (cp.vl["BSM"]["R_APPROACHING"] == 1)
 
-    if self.CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
-      self.lkas_hud = copy.copy(cp_cam.vl["LKAS_HUD"])
+    # if self.CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
+    #   self.lkas_hud = copy.copy(cp_cam.vl["LKAS_HUD"])
 
     if self.CP.carFingerprint not in UNSUPPORTED_DSU_CAR:
       self.pcm_follow_distance = cp.vl["PCM_CRUISE_2"]["PCM_FOLLOW_DISTANCE"]
@@ -215,18 +220,18 @@ class CarState(CarStateBase):
 
     drv_messages = []
     drv_messages += [ ("WHEEL_SPEED_1", 83),	      #0xB0 from Driving BUS
-                  ("WHEEL_SPEED_2", 83),	      #0xB2 from Driving BUS
-                  ("EPS_STATUS", 25),		        #0x262 from Driving BUS
-                  ("GEAR_PACKET", 1),		        #0x3B4 from Driving BUS
-                  ("GAS_PEDAL", 31),            #0x2C1 from Driving BUS
-                  ("BODY_CONTROL_STATE_2", 2),  #0x610 from Driving BUS
-                  ("BODY_CONTROL_STATE", 3),    #0x620 from Driving BUS
-                  ("LIGHT_STALK", 1),           #0x622 from Driving BUS
-                  ("VSC_DATA7", 21),]           #0x320 from Driving BUS 
+                      ("WHEEL_SPEED_2", 83),	      #0xB2 from Driving BUS
+                      ("EPS_STATUS", 25),		        #0x262 from Driving BUS
+                      ("GEAR_PACKET", 1),		        #0x3B4 from Driving BUS
+                      ("GAS_PEDAL", 31),            #0x2C1 from Driving BUS
+                      ("BODY_CONTROL_STATE_2", 2),  #0x610 from Driving BUS
+                      ("BODY_CONTROL_STATE", 3),    #0x620 from Driving BUS
+                      ("LIGHT_STALK", 1),           #0x622 from Driving BUS
+                      ("VSC_DATA7", 21),]           #0x320 from Driving BUS 
     
     bdy_messages = []
-    
-    bdy_messages += [ ("ESP_CONTROL", 3),]     #0x3B7 Gatewayed from Body BUS
+    bdy_messages += [ ("ESP_CONTROL", 3),     #0x3B7 Gatewayed from Body BUS
+                      ("PCM_CRUISE", 1), ]    #0x689 
 
 
 
