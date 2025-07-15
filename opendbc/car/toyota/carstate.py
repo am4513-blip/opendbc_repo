@@ -87,7 +87,7 @@ class CarState(CarStateBase):
       # if not self.CP.enableDsu and not self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
       #   ret.stockAeb = bool(cp_acc.vl["PRE_COLLISION"]["PRECOLLISION_ACTIVE"] and cp_acc.vl["PRE_COLLISION"]["FORCE"] < -1e-5)
       if self.CP.carFingerprint != CAR.TOYOTA_MIRAI:
-        ret.engineRpm = cp.vl["ENGINE_RPM"]["RPM"]
+        ret.engineRpm = 1000 #cp.vl["ENGINE_RPM"]["RPM"] #TODO: Find ENG SPD. Search doesn't show what it is used for though
 
     # ret.wheelSpeeds = self.get_wheel_speeds(
     #   cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_FL"],
