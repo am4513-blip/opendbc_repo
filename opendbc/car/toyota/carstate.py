@@ -57,6 +57,7 @@ class CarState(CarStateBase):
     cp = can_parsers[Bus.pt]
     #cp_cam = can_parsers[Bus.cam]
     cp_drv = can_parsers[Bus.drv]
+    cp_bdy = can_parsers[Bus.body]
 
     ret = structs.CarState()
     #cp_acc = cp_cam if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR) else cp
@@ -70,7 +71,7 @@ class CarState(CarStateBase):
     ret.parkingBrake = cp_drv.vl["BODY_CONTROL_STATE"]["PARKING_BRAKE"] == 1
 
     ret.brakePressed = cp.vl["BRAKE_MODULE"]["BRAKE_PRESSED"] != 0
-    ret.brakeHoldActive = cp.vl["ESP_CONTROL"]["BRAKE_HOLD_ACTIVE"] == 1
+    ret.brakeHoldActive = cp_bdy.vl["ESP_CONTROL"]["BRAKE_HOLD_ACTIVE"] == 1
 
     if self.CP.flags & ToyotaFlags.SECOC.value:
       self.secoc_synchronization = copy.copy(cp.vl["SECOC_SYNCHRONIZATION"])
@@ -222,9 +223,15 @@ class CarState(CarStateBase):
                   ("BODY_CONTROL_STATE", 3),    #0x620 from Driving BUS
                   ("LIGHT_STALK", 1),           #0x622 from Driving BUS
                   ("VSC_DATA7", 21),]           #0x320 from Driving BUS 
+    
+    bdy_messages = []
+    
+    bdy_messages += [ ("ESP_CONTROL", 3),]     #0x3B7 Gatewayed from Body BUS
+
 
 
     return {
       Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], str_messages, 0),
       Bus.drv: CANParser(DBC[CP.carFingerprint][Bus.pt], drv_messages, 4),
+      Bus.body: CANParser(DBC[CP.carFingerprint][Bus.pt], bdy_messages, 8),
     }
