@@ -188,10 +188,11 @@ class CarState(CarStateBase):
       ret.cruiseState.standstill = self.pcm_acc_status == 7
     #ret.cruiseState.enabled = bool(cp.vl["PCM_CRUISE"]["CRUISE_ACTIVE"])
     ret.cruiseState.enabled = bool(cp_bdy.vl["PCM_CRUISE"]["CRUISE_ACTIVE"])
-    ret.cruiseState.nonAdaptive = self.pcm_acc_status in (1, 2, 3, 4, 5, 6)
+    #ret.cruiseState.nonAdaptive = self.pcm_acc_status in (1, 2, 3, 4, 5, 6)
 
     ret.genericToggle = bool(cp.vl["LIGHT_STALK"]["AUTO_HIGH_BEAM"])
-    ret.espDisabled = cp.vl["ESP_CONTROL"]["TC_DISABLED"] != 0
+    #ret.espDisabled = cp.vl["ESP_CONTROL"]["TC_DISABLED"] != 0
+    ret.espDisabled = cp_bdy.vl["ESP_CONTROL"]["TC_DISABLED"] != 0 #####################################
 
     # if self.CP.enableBsm:
     #   ret.leftBlindspot = (cp.vl["BSM"]["L_ADJACENT"] == 1) or (cp.vl["BSM"]["L_APPROACHING"] == 1)
