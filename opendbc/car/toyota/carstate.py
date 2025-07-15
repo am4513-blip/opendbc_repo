@@ -190,7 +190,7 @@ class CarState(CarStateBase):
     ret.cruiseState.enabled = bool(cp_bdy.vl["PCM_CRUISE"]["CRUISE_ACTIVE"])
     #ret.cruiseState.nonAdaptive = self.pcm_acc_status in (1, 2, 3, 4, 5, 6)
 
-    ret.genericToggle = bool(cp.vl["LIGHT_STALK"]["AUTO_HIGH_BEAM"])
+    ret.genericToggle = bool(cp_drv.vl["LIGHT_STALK"]["AUTO_HIGH_BEAM"])
     #ret.espDisabled = cp.vl["ESP_CONTROL"]["TC_DISABLED"] != 0
     ret.espDisabled = cp_bdy.vl["ESP_CONTROL"]["TC_DISABLED"] != 0 #####################################
 
