@@ -56,17 +56,18 @@ class CarState(CarStateBase):
   def update(self, can_parsers) -> structs.CarState:
     cp = can_parsers[Bus.pt]
     cp_cam = can_parsers[Bus.cam]
+    cp_drv = can_parsers[Bus.drv]
 
     ret = structs.CarState()
-    cp_acc = cp_cam if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR) else cp
+    #cp_acc = cp_cam if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR) else cp
 
-    if not self.CP.flags & ToyotaFlags.SECOC.value:
-      self.gvc = cp.vl["VSC1S07"]["GVC"]
+    # if not self.CP.flags & ToyotaFlags.SECOC.value:
+    #   self.gvc = cp.vl["VSC1S07"]["GVC"]
 
-    ret.doorOpen = any([cp.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FL"], cp.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FR"],
-                        cp.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_RL"], cp.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_RR"]])
-    ret.seatbeltUnlatched = cp.vl["BODY_CONTROL_STATE"]["SEATBELT_DRIVER_UNLATCHED"] != 0
-    ret.parkingBrake = cp.vl["BODY_CONTROL_STATE"]["PARKING_BRAKE"] == 1
+    ret.doorOpen = any([cp_drv.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FL"], cp_drv.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FR"],
+                        cp_drv.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_RL"], cp_drv.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_RR"]])
+    ret.seatbeltUnlatched = cp_drv.vl["BODY_CONTROL_STATE"]["SEATBELT_DRIVER_UNLATCHED"] != 0
+    ret.parkingBrake = cp_drv.vl["BODY_CONTROL_STATE"]["PARKING_BRAKE"] == 1
 
     ret.brakePressed = cp.vl["BRAKE_MODULE"]["BRAKE_PRESSED"] != 0
     ret.brakeHoldActive = cp.vl["ESP_CONTROL"]["BRAKE_HOLD_ACTIVE"] == 1
@@ -103,8 +104,9 @@ class CarState(CarStateBase):
 
     ret.standstill = abs(ret.vEgoRaw) < 1e-3
 
-    ret.steeringAngleDeg = cp.vl["STEER_ANGLE_SENSOR"]["STEER_ANGLE"] + cp.vl["STEER_ANGLE_SENSOR"]["STEER_FRACTION"]
-    ret.steeringRateDeg = cp.vl["STEER_ANGLE_SENSOR"]["STEER_RATE"]
+    #ret.steeringAngleDeg = cp.vl["STEER_ANGLE_SENSOR"]["STEER_ANGLE"] + cp.vl["STEER_ANGLE_SENSOR"]["STEER_FRACTION"]
+    ret.steeringRateDeg = 0 #cp.vl["STEER_ANGLE_SENSOR"]["STEER_RATE"]
+    ret.steeringAngleDeg = cp.vl["STEER_ANGLE_SENSOR_VGRS"]["STEER_ANGLE"]
     torque_sensor_angle_deg = cp.vl["STEER_TORQUE_SENSOR"]["STEER_ANGLE"]
 
     # On some cars, the angle measurement is non-zero while initializing
@@ -130,16 +132,16 @@ class CarState(CarStateBase):
     ret.steeringPressed = abs(ret.steeringTorque) > STEER_THRESHOLD
 
     # Check EPS LKA/LTA fault status
-    ret.steerFaultTemporary = cp.vl["EPS_STATUS"]["LKA_STATE"] in TEMP_STEER_FAULTS
-    ret.steerFaultPermanent = cp.vl["EPS_STATUS"]["LKA_STATE"] in PERM_STEER_FAULTS
+    ret.steerFaultTemporary = cp_drv.vl["EPS_STATUS"]["LKA_STATE"] in TEMP_STEER_FAULTS
+    ret.steerFaultPermanent = cp_drv.vl["EPS_STATUS"]["LKA_STATE"] in PERM_STEER_FAULTS
 
-    if self.CP.steerControlType == SteerControlType.angle:
-      ret.steerFaultTemporary = ret.steerFaultTemporary or cp.vl["EPS_STATUS"]["LTA_STATE"] in TEMP_STEER_FAULTS
-      ret.steerFaultPermanent = ret.steerFaultPermanent or cp.vl["EPS_STATUS"]["LTA_STATE"] in PERM_STEER_FAULTS
+    # if self.CP.steerControlType == SteerControlType.angle:
+    #   ret.steerFaultTemporary = ret.steerFaultTemporary or cp.vl["EPS_STATUS"]["LTA_STATE"] in TEMP_STEER_FAULTS
+    #   ret.steerFaultPermanent = ret.steerFaultPermanent or cp.vl["EPS_STATUS"]["LTA_STATE"] in PERM_STEER_FAULTS
 
       # Lane Tracing Assist control is unavailable (EPS_STATUS->LTA_STATE=0) until
       # the more accurate angle sensor signal is initialized
-      ret.vehicleSensorsInvalid = not self.accurate_steer_angle_seen
+      #ret.vehicleSensorsInvalid = not self.accurate_steer_angle_seen
 
     if self.CP.carFingerprint in UNSUPPORTED_DSU_CAR:
       # TODO: find the bit likely in DSU_CRUISE that describes an ACC fault. one may also exist in CLUTCH
@@ -159,9 +161,9 @@ class CarState(CarStateBase):
       conversion_factor = CV.KPH_TO_MS if is_metric else CV.MPH_TO_MS
       ret.cruiseState.speedCluster = cluster_set_speed * conversion_factor
 
-    if self.CP.carFingerprint in TSS2_CAR and not self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
-      self.acc_type = cp_acc.vl["ACC_CONTROL"]["ACC_TYPE"]
-      ret.stockFcw = bool(cp_acc.vl["PCS_HUD"]["FCW"])
+    # if self.CP.carFingerprint in TSS2_CAR and not self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
+    #   self.acc_type = cp_acc.vl["ACC_CONTROL"]["ACC_TYPE"]
+    #   ret.stockFcw = bool(cp_acc.vl["PCS_HUD"]["FCW"])
 
     # some TSS2 cars have low speed lockout permanently set, so ignore on those cars
     # these cars are identified by an ACC_TYPE value of 2.
@@ -195,7 +197,7 @@ class CarState(CarStateBase):
     if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR):
       # distance button is wired to the ACC module (camera or radar)
       prev_distance_button = self.distance_button
-      self.distance_button = cp_acc.vl["ACC_CONTROL"]["DISTANCE"]
+      #self.distance_button = cp_acc.vl["ACC_CONTROL"]["DISTANCE"]
 
       ret.buttonEvents = create_button_events(self.distance_button, prev_distance_button, {1: ButtonType.gapAdjustCruise})
 
@@ -208,75 +210,21 @@ class CarState(CarStateBase):
       ("BRAKE_MODULE", 40),             #0x224 On Steering BUS
       ("STEER_ANGLE_SENSOR_VGRS", 83),  #0x26 from RS485-to-CAN baord
       ("STEER_TORQUE_SENSOR", 50),]     #0x260 On Steering BUS
-    # pt_messages = [
-    #   ("LIGHT_STALK", 1),
-    #   ("BLINKERS_STATE", 0.15),
-    #   ("BODY_CONTROL_STATE", 3),
-    #   ("BODY_CONTROL_STATE_2", 2),
-    #   ("ESP_CONTROL", 3),
-    #   ("EPS_STATUS", 25),
-    #   ("BRAKE_MODULE", 40),
-    #   ("WHEEL_SPEEDS", 80),
-    #   ("STEER_ANGLE_SENSOR", 80),
-    #   ("PCM_CRUISE", 33),
-    #   ("PCM_CRUISE_SM", 1),
-    #   ("STEER_TORQUE_SENSOR", 50),
-    # ]
 
-    # if CP.flags & ToyotaFlags.SECOC.value:
-    #   pt_messages += [
-    #     ("GEAR_PACKET_HYBRID", 60),
-    #     ("SECOC_SYNCHRONIZATION", 10),
-    #     ("GAS_PEDAL", 42),
-    #   ]
-    # else:
-    #   pt_messages.append(("VSC1S07", 20))
-    #   if CP.carFingerprint not in [CAR.TOYOTA_MIRAI]:
-    #     pt_messages.append(("ENGINE_RPM", 42))
 
-    #   pt_messages += [
-    #     ("GEAR_PACKET", 1),
-    #   ]
+    drv_messages = []
+    drv_messages += [ ("WHEEL_SPEED_1", 83),	      #0xB0 from Driving BUS
+                  ("WHEEL_SPEED_2", 83),	      #0xB2 from Driving BUS
+                  ("EPS_STATUS", 25),		        #0x262 from Driving BUS
+                  ("GEAR_PACKET", 1),		        #0x3B4 from Driving BUS
+                  ("GAS_PEDAL", 31),            #0x2C1 from Driving BUS
+                  ("BODY_CONTROL_STATE_2", 2),  #0x610 from Driving BUS
+                  ("BODY_CONTROL_STATE", 3),    #0x620 from Driving BUS
+                  ("LIGHT_STALK", 1),           #0x622 from Driving BUS
+                  ("VSC_DATA7", 21),]           #0x320 from Driving BUS 
 
-    # if CP.carFingerprint in UNSUPPORTED_DSU_CAR:
-    #   pt_messages.append(("DSU_CRUISE", 5))
-    #   pt_messages.append(("PCM_CRUISE_ALT", 1))
-    # else:
-    #   pt_messages.append(("PCM_CRUISE_2", 33))
-
-    # if CP.enableBsm:
-    #   pt_messages.append(("BSM", 1))
-
-    # if CP.carFingerprint in RADAR_ACC_CAR and not CP.flags & ToyotaFlags.DISABLE_RADAR.value:
-    #   pt_messages += [
-    #     ("PCS_HUD", 1),
-    #     ("ACC_CONTROL", 33),
-    #   ]
-
-    # if CP.carFingerprint not in (TSS2_CAR - RADAR_ACC_CAR) and not CP.enableDsu and not CP.flags & ToyotaFlags.DISABLE_RADAR.value:
-    #   pt_messages += [
-    #     ("PRE_COLLISION", 33),
-    #   ]
-
-    cam_messages = []
-    if CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
-      cam_messages += [
-        ("LKAS_HUD", 1),
-      ]
-
-    if CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR):
-      cam_messages += [
-        ("ACC_CONTROL", 33),
-        ("PCS_HUD", 1),
-      ]
-
-      # TODO: Figure out new layout of the PRE_COLLISION message
-      if not CP.flags & ToyotaFlags.SECOC.value:
-        cam_messages += [
-          ("PRE_COLLISION", 33),
-        ]
 
     return {
       Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], str_messages, 0),
-      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], cam_messages, 2),
+      Bus.drv: CANParser(DBC[CP.carFingerprint][Bus.pt], drv_messages, 4),
     }

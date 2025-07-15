@@ -7,30 +7,36 @@ from opendbc.car.interfaces import RadarInterfaceBase
 
 
 def _create_radar_can_parser(car_fingerprint):
-  if car_fingerprint in TSS2_CAR:
-    RADAR_A_MSGS = list(range(0x180, 0x190))
-    RADAR_B_MSGS = list(range(0x190, 0x1a0))
-  else:
-    RADAR_A_MSGS = list(range(0x210, 0x220))
-    RADAR_B_MSGS = list(range(0x220, 0x230))
+  # if car_fingerprint in TSS2_CAR:
+  #   RADAR_A_MSGS = list(range(0x180, 0x190))
+  #   RADAR_B_MSGS = list(range(0x190, 0x1a0))
+  # else:
+  #   RADAR_A_MSGS = list(range(0x210, 0x220))
+  #   RADAR_B_MSGS = list(range(0x220, 0x230))
+    
+  RADAR_A_MSGS = list(range(0x290, 0x298)) #zero based, so range must be +1 than the actual ending CAN ID
+  RADAR_B_MSGS = list(range(0x2B0, 0x2B4)) #zero based, so range must be +1 than the actual ending CAN ID
 
   msg_a_n = len(RADAR_A_MSGS)
   msg_b_n = len(RADAR_B_MSGS)
   messages = list(zip(RADAR_A_MSGS + RADAR_B_MSGS, [20] * (msg_a_n + msg_b_n), strict=True))
 
-  return CANParser(DBC[car_fingerprint][Bus.radar], messages, 1)
+  return CANParser(DBC[car_fingerprint][Bus.radar], messages, 5)
 
 class RadarInterface(RadarInterfaceBase):
   def __init__(self, CP):
     super().__init__(CP)
     self.track_id = 0
 
-    if CP.carFingerprint in TSS2_CAR:
-      self.RADAR_A_MSGS = list(range(0x180, 0x190))
-      self.RADAR_B_MSGS = list(range(0x190, 0x1a0))
-    else:
-      self.RADAR_A_MSGS = list(range(0x210, 0x220))
-      self.RADAR_B_MSGS = list(range(0x220, 0x230))
+    # if CP.carFingerprint in TSS2_CAR:
+    #   self.RADAR_A_MSGS = list(range(0x180, 0x190))
+    #   self.RADAR_B_MSGS = list(range(0x190, 0x1a0))
+    # else:
+    #   self.RADAR_A_MSGS = list(range(0x210, 0x220))
+    #   self.RADAR_B_MSGS = list(range(0x220, 0x230))
+      
+    self.RADAR_A_MSGS = list(range(0x290, 0x298)) #zero based, so range must be +1 than the actual ending CAN ID
+    self.RADAR_B_MSGS = list(range(0x2B0, 0x2B4)) #zero based, so range must be +1 than the actual ending CAN ID
 
     self.valid_cnt = {key: 0 for key in self.RADAR_A_MSGS}
 
@@ -69,8 +75,38 @@ class RadarInterface(RadarInterfaceBase):
         else:
           self.valid_cnt[ii] = max(self.valid_cnt[ii] - 1, 0)
 
-        score = self.rcp.vl[ii+16]['SCORE']
+        #score = self.rcp.vl[ii+16]['SCORE']
         # print ii, self.valid_cnt[ii], score, cpt['VALID'], cpt['LONG_DIST'], cpt['LAT_DIST']
+        
+        #Lexus_LS uses different radar messages. SCORE message contains the SCORE signal for two different radar track points
+        # i.e. 0x2B0 SCORE Msg contains the SCORE signal for both 0x290 and 0x291 radar track point msgs
+        # The difference in the correspond CAN IDs (TRACK ID - SCORE ID) is 32 instead of 16
+        # TODO: Normal Toyota Radar Module Outputs 16 TRACK Msgs and 16 corresponding SCORE Msgs
+        # From LS CAN logs valid radar TRACK points seems to only come from 8 CAN msgs (0x290-0x297) 
+        # Check if CAN Msgs 0x220-0x227 also contain valid Radar TRACK points. 
+        # May need to drive under different conditions to create valid points for these CAN IDs
+        # If valid points do appear, verify if the corresponding SCORE Msgs are 0x230-0x233
+        
+        
+        if ii % 2 == 0:
+          if ii == 656: #Msg 0x290
+            score = self.rcp.vl[(ii+32)]['SCORE']
+          elif ii == 658:
+            score = self.rcp.vl[(ii+31)]['SCORE']
+          elif ii == 660:
+            score = self.rcp.vl[(ii+30)]['SCORE']
+          elif ii == 662:
+            score = self.rcp.vl[(ii+29)]['SCORE']
+            
+        else:
+          if ii == 657: #Msg 0x291
+            score = self.rcp.vl[(ii+31)]['SCORE2']
+          elif ii == 659:
+            score = self.rcp.vl[(ii+30)]['SCORE2']
+          elif ii == 661:
+            score = self.rcp.vl[(ii+29)]['SCORE2']
+          elif ii == 663:
+            score = self.rcp.vl[(ii+28)]['SCORE2']
 
         # radar point only valid if it's a valid measurement and score is above 50
         if cpt['VALID'] or (score > 50 and cpt['LONG_DIST'] < 255 and self.valid_cnt[ii] > 0):
