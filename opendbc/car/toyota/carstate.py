@@ -202,7 +202,7 @@ class CarState(CarStateBase):
     #   self.lkas_hud = copy.copy(cp_cam.vl["LKAS_HUD"])
 
     if self.CP.carFingerprint not in UNSUPPORTED_DSU_CAR:
-      self.pcm_follow_distance = cp.vl["PCM_CRUISE_2"]["PCM_FOLLOW_DISTANCE"]
+      self.pcm_follow_distance = 1 #cp.vl["PCM_CRUISE_2"]["PCM_FOLLOW_DISTANCE"] #TODO: Find CAN msg for follow dist
 
     if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR):
       # distance button is wired to the ACC module (camera or radar)
