@@ -85,17 +85,24 @@ def scale_tire_stiffness(mass, wheelbase, center_to_front, tire_stiffness_factor
 DbcDict = dict[StrEnum, str]
 
 class Bus(StrEnum):
-  pt = auto()
+  pt = auto()   #internal panda on C3X (CAN 0) Vehicle Side of Steering BUS
   cam = auto()
-  radar = auto()
+  radar = auto() #external panda 1 (CAN 5)
   adas = auto()
   alt = auto()
-  body = auto()
+  body = auto() #external panda 2 (CAN 10)
   chassis = auto()
   loopback = auto()
   main = auto()
   party = auto()
   ap_party = auto()
+  
+  #Adding busses for Lexus LS
+  
+  drv = auto() #external panda 1 (CAN 4) Vehicle Side of Driving BUS
+  dsu_str = auto() #internal panda on C3X (CAN 2)
+  dsu_drv = auto() #external panda 1 (CAN 6)
+  dsu_bdy = auto() #external panda 2 (CAN 10)
 
 
 def apply_driver_steer_torque_limits(apply_torque: int, apply_torque_last: int, driver_torque: float, LIMITS, steer_max: int = None):
