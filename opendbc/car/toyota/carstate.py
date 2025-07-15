@@ -84,12 +84,19 @@ class CarState(CarStateBase):
       if self.CP.carFingerprint != CAR.TOYOTA_MIRAI:
         ret.engineRpm = cp.vl["ENGINE_RPM"]["RPM"]
 
+    # ret.wheelSpeeds = self.get_wheel_speeds(
+    #   cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_FL"],
+    #   cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_FR"],
+    #   cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_RL"],
+    #   cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_RR"],
+    # )
+    
+        #Lexus LS Wheels Speed on two different CAN Msgs
     ret.wheelSpeeds = self.get_wheel_speeds(
-      cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_FL"],
-      cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_FR"],
-      cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_RL"],
-      cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_RR"],
-    )
+      cp_cam.vl["WHEEL_SPEED_1"]["WHEEL_SPEED_FL"],
+      cp_cam.vl["WHEEL_SPEED_1"]["WHEEL_SPEED_FR"],
+      cp_cam.vl["WHEEL_SPEED_2"]["WHEEL_SPEED_RL"],
+      cp_cam.vl["WHEEL_SPEED_2"]["WHEEL_SPEED_RR"],)
     ret.vEgoRaw = float(np.mean([ret.wheelSpeeds.fl, ret.wheelSpeeds.fr, ret.wheelSpeeds.rl, ret.wheelSpeeds.rr]))
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
     ret.vEgoCluster = ret.vEgo * 1.015  # minimum of all the cars
@@ -196,55 +203,60 @@ class CarState(CarStateBase):
 
   @staticmethod
   def get_can_parsers(CP):
-    pt_messages = [
-      ("LIGHT_STALK", 1),
-      ("BLINKERS_STATE", 0.15),
-      ("BODY_CONTROL_STATE", 3),
-      ("BODY_CONTROL_STATE_2", 2),
-      ("ESP_CONTROL", 3),
-      ("EPS_STATUS", 25),
-      ("BRAKE_MODULE", 40),
-      ("WHEEL_SPEEDS", 80),
-      ("STEER_ANGLE_SENSOR", 80),
-      ("PCM_CRUISE", 33),
-      ("PCM_CRUISE_SM", 1),
-      ("STEER_TORQUE_SENSOR", 50),
-    ]
+    str_messages = [
+      ("BLINKERS_STATE", 3.3),          #0x650 On Steering BUS
+      ("BRAKE_MODULE", 40),             #0x224 On Steering BUS
+      ("STEER_ANGLE_SENSOR_VGRS", 83),  #0x26 from RS485-to-CAN baord
+      ("STEER_TORQUE_SENSOR", 50),]     #0x260 On Steering BUS
+    # pt_messages = [
+    #   ("LIGHT_STALK", 1),
+    #   ("BLINKERS_STATE", 0.15),
+    #   ("BODY_CONTROL_STATE", 3),
+    #   ("BODY_CONTROL_STATE_2", 2),
+    #   ("ESP_CONTROL", 3),
+    #   ("EPS_STATUS", 25),
+    #   ("BRAKE_MODULE", 40),
+    #   ("WHEEL_SPEEDS", 80),
+    #   ("STEER_ANGLE_SENSOR", 80),
+    #   ("PCM_CRUISE", 33),
+    #   ("PCM_CRUISE_SM", 1),
+    #   ("STEER_TORQUE_SENSOR", 50),
+    # ]
 
-    if CP.flags & ToyotaFlags.SECOC.value:
-      pt_messages += [
-        ("GEAR_PACKET_HYBRID", 60),
-        ("SECOC_SYNCHRONIZATION", 10),
-        ("GAS_PEDAL", 42),
-      ]
-    else:
-      pt_messages.append(("VSC1S07", 20))
-      if CP.carFingerprint not in [CAR.TOYOTA_MIRAI]:
-        pt_messages.append(("ENGINE_RPM", 42))
+    # if CP.flags & ToyotaFlags.SECOC.value:
+    #   pt_messages += [
+    #     ("GEAR_PACKET_HYBRID", 60),
+    #     ("SECOC_SYNCHRONIZATION", 10),
+    #     ("GAS_PEDAL", 42),
+    #   ]
+    # else:
+    #   pt_messages.append(("VSC1S07", 20))
+    #   if CP.carFingerprint not in [CAR.TOYOTA_MIRAI]:
+    #     pt_messages.append(("ENGINE_RPM", 42))
 
-      pt_messages += [
-        ("GEAR_PACKET", 1),
-      ]
+    #   pt_messages += [
+    #     ("GEAR_PACKET", 1),
+    #   ]
 
-    if CP.carFingerprint in UNSUPPORTED_DSU_CAR:
-      pt_messages.append(("DSU_CRUISE", 5))
-      pt_messages.append(("PCM_CRUISE_ALT", 1))
-    else:
-      pt_messages.append(("PCM_CRUISE_2", 33))
+    # if CP.carFingerprint in UNSUPPORTED_DSU_CAR:
+    #   pt_messages.append(("DSU_CRUISE", 5))
+    #   pt_messages.append(("PCM_CRUISE_ALT", 1))
+    # else:
+    #   pt_messages.append(("PCM_CRUISE_2", 33))
 
-    if CP.enableBsm:
-      pt_messages.append(("BSM", 1))
+    # if CP.enableBsm:
+    #   pt_messages.append(("BSM", 1))
 
-    if CP.carFingerprint in RADAR_ACC_CAR and not CP.flags & ToyotaFlags.DISABLE_RADAR.value:
-      pt_messages += [
-        ("PCS_HUD", 1),
-        ("ACC_CONTROL", 33),
-      ]
+    # if CP.carFingerprint in RADAR_ACC_CAR and not CP.flags & ToyotaFlags.DISABLE_RADAR.value:
+    #   pt_messages += [
+    #     ("PCS_HUD", 1),
+    #     ("ACC_CONTROL", 33),
+    #   ]
 
-    if CP.carFingerprint not in (TSS2_CAR - RADAR_ACC_CAR) and not CP.enableDsu and not CP.flags & ToyotaFlags.DISABLE_RADAR.value:
-      pt_messages += [
-        ("PRE_COLLISION", 33),
-      ]
+    # if CP.carFingerprint not in (TSS2_CAR - RADAR_ACC_CAR) and not CP.enableDsu and not CP.flags & ToyotaFlags.DISABLE_RADAR.value:
+    #   pt_messages += [
+    #     ("PRE_COLLISION", 33),
+    #   ]
 
     cam_messages = []
     if CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
@@ -265,6 +277,6 @@ class CarState(CarStateBase):
         ]
 
     return {
-      Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], pt_messages, 0),
+      Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], str_messages, 0),
       Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], cam_messages, 2),
     }
