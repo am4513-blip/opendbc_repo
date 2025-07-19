@@ -23,8 +23,12 @@ class CarInterface(CarInterfaceBase):
   @staticmethod
   def _get_params(ret: structs.CarParams, candidate, fingerprint, car_fw, alpha_long, is_release, docs) -> structs.CarParams:
     ret.brand = "toyota"
-    ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.toyota)]
-    ret.safetyConfigs[0].safetyParam = EPS_SCALE[candidate]
+    ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.toyota, 4096 ),
+                         get_safety_config(structs.CarParams.SafetyModel.toyota, 8192 ),
+                         get_safety_config(structs.CarParams.SafetyModel.toyota, 16384 ),] #TODO: Add Flags for each bus
+    ret.safetyConfigs[0].safetyParam |= EPS_SCALE[candidate]
+    #ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.toyota)]
+    #ret.safetyConfigs[0].safetyParam = EPS_SCALE[candidate]
 
     # BRAKE_MODULE is on a different address for these cars
     if DBC[candidate][Bus.pt] == "toyota_new_mc_pt_generated":

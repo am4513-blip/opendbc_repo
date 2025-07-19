@@ -55,6 +55,10 @@ class ToyotaSafetyFlags(IntFlag):
   STOCK_LONGITUDINAL = (2 << 8)
   LTA = (4 << 8)
   SECOC = (8 << 8)
+  
+  TOYOTA_STEERING_BUS = 4096
+  TOYOTA_DRIVING_BUS = 8192
+  TOYOTA_DRIVING_BUS = 16384
 
 
 class ToyotaFlags(IntFlag):
@@ -75,6 +79,10 @@ class ToyotaFlags(IntFlag):
   # these cars can utilize 2.0 m/s^2
   RAISED_ACCEL_LIMIT = 1024
   SECOC = 2048
+  
+  TOYOTA_STEERING_BUS = 4096
+  TOYOTA_DRIVING_BUS = 8192
+  TOYOTA_DRIVING_BUS = 16384
 
 
 def dbc_dict(pt, radar):
@@ -617,7 +625,7 @@ STEER_THRESHOLD = 100
 
 # These cars have non-standard EPS torque scale factors. All others are 73
 EPS_SCALE = defaultdict(lambda: 73,
-                        {CAR.TOYOTA_PRIUS: 66, CAR.TOYOTA_COROLLA: 88, CAR.LEXUS_IS: 77, CAR.LEXUS_RC: 77, CAR.LEXUS_CTH: 100, CAR.TOYOTA_PRIUS_V: 100})
+                        {CAR.TOYOTA_PRIUS: 66, CAR.TOYOTA_COROLLA: 88, CAR.LEXUS_IS: 77, CAR.LEXUS_RC: 77, CAR.LEXUS_CTH: 100, CAR.TOYOTA_PRIUS_V: 100, CAR.LEXUS_LS: 180})
 
 # Toyota/Lexus Safety Sense 2.0 and 2.5
 TSS2_CAR = CAR.with_flags(ToyotaFlags.TSS2)
