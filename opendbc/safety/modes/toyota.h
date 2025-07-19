@@ -10,7 +10,7 @@
   TOYOTA_BASE_TX_MSGS \
   {0x689, 0, 8, .check_relay = true}, \
   {0x180, 0, 5, .check_relay = true}, \
-  {0x343, 0, 8, .check_relay = false},  /* ACC cancel cmd */  \
+  {0x280, 0, 8, .check_relay = false},  /* ACC cancel cmd */  \
 
 #define TOYOTA_COMMON_SECOC_TX_MSGS \
   TOYOTA_BASE_TX_MSGS \
@@ -21,15 +21,15 @@
   TOYOTA_COMMON_TX_MSGS \
   /* DSU bus 0 */ \
   {0x280, 0, 8, .check_relay = true},  \
-  {0x790, 2, 8, .check_relay = flase},
+  {0x790, 2, 8, .check_relay = flase}, \
 
-#define TOYOTA_COMMON_RX_CHECKS(lta)                                                                                                       \ 
-  {.msg = {{0x260, 0, 8, .ignore_counter = true, .ignore_quality_flag=!(lta), .frequency = 50U}, { 0 }, { 0 }}},                           \
+#define TOYOTA_COMMON_RX_CHECKS(lta)   \                                                                                                   \ 
+  {.msg = {{0x260, 0, 8, .ignore_counter = true, .ignore_quality_flag=!(lta), .frequency = 50U}, { 0 }, { 0 }}},         \                  \
 
 #define TOYOTA_RX_CHECKS(lta)                                                                                                               \
   TOYOTA_COMMON_RX_CHECKS(lta)                                                                                                              \
-  {.msg = {{ 0xB0, 0, 8, .ignore_checksum = true, .frequency = 83U}, { 0 }, { 0 }}},                                                        \
-  {.msg = {{ 0xB2, 0, 8, .ignore_checksum = true, .frequency = 83U}, { 0 }, { 0 }}},                                                        \
+  {.msg = {{ 0xB0, 0, 8, .ignore_checksum = true, .frequency = 83U}, { 0 }, { 0 }}},                               \                                                \
+  {.msg = {{ 0xB2, 0, 8, .ignore_checksum = true, .frequency = 83U}, { 0 }, { 0 }}},                               \                                                    \
   {.msg = {{0x689, 1, 8, .frequency = 1U}, { 0 }, { 0 }}},                                                         \
   {.msg = {{0x2C1, 0, 8, .frequency = 31U}, { 0 }, { 0 }}},                                                        \
   //{.msg = {{0x1D2, 0, 8, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 33U}, { 0 }, { 0 }}},                            \
