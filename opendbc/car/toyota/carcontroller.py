@@ -279,10 +279,12 @@ class CarController(CarControllerBase):
     #     if self.frame % fr_step == 0 and self.CP.carFingerprint in cars:
     #       can_sends.append(CanData(addr, vl, bus))
     
+    
     # Test sending diagnostic message on drving bus
     # % 20 = 200ms periodic send rate
     if self.frame % 20 == 0:
       can_sends.append(toyotacan.create_ls_dsu_diag_msg(self.packer, 0x02, 0x21, 0x01))
+      can_sends.append(toyotacan.create_ls_pcm_cruise_command(self.packer, 1, 1, 40))
 
     # keep radar disabled
     # if self.frame % 20 == 0 and self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
