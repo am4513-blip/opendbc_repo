@@ -339,7 +339,8 @@ static safety_config toyota_init(uint16_t param) {
   static const CanMsg TOYOTA_STR_TX_MSGS[] = {{0x180, 0, 5, .check_relay = true}};  //STEERING COMMAND
 
   // DSU_DIAG_REQ_MSG would not get sent out until the CAN BUS was changed to CAN 2
-  static const CanMsg TOYOTA_DRV_TX_MSGS[] = {{0x280, 0, 8, .check_relay = true}, {0x790, 2, 8, .check_relay = false} };  // ACC_COMMAND and DSU DIAG REQ MSG
+  static const CanMsg TOYOTA_DRV_TX_MSGS[] = {{0x280, 0, 8, .check_relay = true},       // ACC_COMMAND
+                                              {0x790, 2, 8, .check_relay = false} };    //DSU DIAG REQ MSG
 
   static const CanMsg TOYOTA_BDY_TX_MSGS[] = {{0x689, 0, 8, .check_relay = true}};  //RADAR ACTIVE
   // static const CanMsg TOYOTA_TX_MSGS[] = {
@@ -388,9 +389,9 @@ static safety_config toyota_init(uint16_t param) {
   SET_TX_MSGS(TOYOTA_BDY_TX_MSGS, ret);
 
   static RxCheck toyota_lta_rx_checks[] = {
-    {.msg = {{0x260, 0, 8, .ignore_counter = true, .ignore_quality_flag=!(true), .frequency = 50U}, { 0 }, { 0 }}},                                                                                                               \                                                                                                             \
+    {.msg = {{0x260, 0, 8, .ignore_counter = true, .ignore_quality_flag=!(true), .frequency = 50U}, { 0 }, { 0 }}},              
     {.msg = {{ 0xB0, 0, 8, .ignore_checksum = true, .frequency = 83U}, { 0 }, { 0 }}},                                                   
-    {.msg = {{ 0xB2, 0, 8, .ignore_checksum = true, .frequency = 83U}, { 0 }, { 0 }}},                                                                                   \
+    {.msg = {{ 0xB2, 0, 8, .ignore_checksum = true, .frequency = 83U}, { 0 }, { 0 }}},                                                                               
     {.msg = {{0x689, 1, 8, .frequency = 1U}, { 0 }, { 0 }}},                                                         
     {.msg = {{0x2C1, 0, 8, .frequency = 31U}, { 0 }, { 0 }}},
     {.msg = {{0x224, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 40U}, { 0 }, { 0 }}},
