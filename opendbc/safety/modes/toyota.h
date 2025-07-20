@@ -114,7 +114,9 @@ static void toyota_rx_hook(const CANPacket_t *to_push) {
       }
        // check that all wheel speeds are at zero value
        vehicle_moving = speed != 0;
+       UPDATE_VEHICLE_SPEED(speed / 4.0 * 0.01 * KPH_TO_MS);
       }
+    
     //sample speed
     // if (addr == 0xaa) {
     //   int speed = 0;
@@ -131,7 +133,7 @@ static void toyota_rx_hook(const CANPacket_t *to_push) {
       gas_pressed = ( (GET_BYTE(to_push, 6) << 8) | (GET_BYTE(to_push, 7)) ) > 1000; //pedal is really sensitive
     }
       
-      UPDATE_VEHICLE_SPEED(speed / 4.0 * 0.01 * KPH_TO_MS);
+      
    }
 
     if (GET_BUS(to_push) == 1U ) {
