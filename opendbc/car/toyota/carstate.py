@@ -54,10 +54,11 @@ class CarState(CarStateBase):
     self.secoc_synchronization = None
 
   def update(self, can_parsers) -> structs.CarState:
-    cp = can_parsers[Bus.pt]
+    cp = can_parsers[Bus.pt] # steering bus
     #cp_cam = can_parsers[Bus.cam]
     cp_drv = can_parsers[Bus.drv]
     cp_bdy = can_parsers[Bus.body]
+    cp_alt = can_parsers[Bus.alt]
 
     ret = structs.CarState()
     #cp_acc = cp_cam if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR) else cp
@@ -157,7 +158,7 @@ class CarState(CarStateBase):
       ret.accFaulted = cp_drv.vl["VSC_DATA7"]["BRK_ERR_FLGS"] != 0 #cp_body.vl["PCM_CRUISE"]["RDR_CRS_WARN"] != 0 ###################################
       #ret.carFaultedNonCritical = cp.vl["PCM_CRUISE_SM"]["TEMP_ACC_FAULTED"] != 0
       #ret.cruiseState.available = cp.vl["PCM_CRUISE_2"]["MAIN_ON"] != 0
-      ret.cruiseState.available = cp_bdy.vl["PCM_CRUISE"]["RADAR_READY"] != 0
+      ret.cruiseState.available = cp_alt.vl["PCM_CRUISE"]["RADAR_READY"] != 0
       #ret.cruiseState.speed = cp.vl["PCM_CRUISE_2"]["SET_SPEED"] * CV.KPH_TO_MS
       ret.cruiseState.speed = cp_bdy.vl["PCM_CRUISE"]["UI_SET_SPEED"] * CV.MPH_TO_MS ##################################
       cluster_set_speed = 0 #cp.vl["PCM_CRUISE_SM"]["UI_SET_SPEED"]
