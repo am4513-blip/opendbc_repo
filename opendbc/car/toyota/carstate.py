@@ -234,11 +234,10 @@ class CarState(CarStateBase):
                       ("VSC_DATA7", 21),]           #0x320 from Driving BUS 
     
     bdy_messages = []
-    bdy_messages += [ ("ESP_CONTROL", 3),     #0x3B7 Gatewayed from Body BUS
-                      ("PCM_CRUISE", 1), ]    #0x689
+    bdy_messages += [ ("ESP_CONTROL", 3),]     #0x3B7  from Body BUS (CAN 8)
     
-    crs_message = []
-    crs_messages += [("PCM_CRUISE", 1), ]    #0x689
+    crs_messages = []
+    crs_messages += [("PCM_CRUISE", 1),]    #Msg 0x689 DSU sends on CAN 10. OP blocks, but Tx's its own msg on CAN 8.
 
 
 
