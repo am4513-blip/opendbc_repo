@@ -140,28 +140,28 @@ class CarController(CarControllerBase):
       self.secoc_lka_message_counter += 1
     can_sends.append(steer_command)
 
-    # STEERING_LTA does not seem to allow more rate by sending faster, and may wind up easier
-    if self.frame % 2 == 0 and self.CP.carFingerprint in TSS2_CAR:
-      lta_active = lat_active and self.CP.steerControlType == SteerControlType.angle
-      # cut steering torque with TORQUE_WIND_DOWN when either EPS torque or driver torque is above
-      # the threshold, to limit max lateral acceleration and for driver torque blending respectively.
-      full_torque_condition = (abs(CS.out.steeringTorqueEps) < self.params.STEER_MAX and
-                               abs(CS.out.steeringTorque) < self.params.MAX_LTA_DRIVER_TORQUE_ALLOWANCE)
+    # # STEERING_LTA does not seem to allow more rate by sending faster, and may wind up easier
+    # if self.frame % 2 == 0 and self.CP.carFingerprint in TSS2_CAR:
+    #   lta_active = lat_active and self.CP.steerControlType == SteerControlType.angle
+    #   # cut steering torque with TORQUE_WIND_DOWN when either EPS torque or driver torque is above
+    #   # the threshold, to limit max lateral acceleration and for driver torque blending respectively.
+    #   full_torque_condition = (abs(CS.out.steeringTorqueEps) < self.params.STEER_MAX and
+    #                            abs(CS.out.steeringTorque) < self.params.MAX_LTA_DRIVER_TORQUE_ALLOWANCE)
 
-      # TORQUE_WIND_DOWN at 0 ramps down torque at roughly the max down rate of 1500 units/sec
-      torque_wind_down = 100 if lta_active and full_torque_condition else 0
-      can_sends.append(toyotacan.create_lta_steer_command(self.packer, self.CP.steerControlType, self.last_angle,
-                                                          lta_active, self.frame // 2, torque_wind_down))
+    #   # TORQUE_WIND_DOWN at 0 ramps down torque at roughly the max down rate of 1500 units/sec
+    #   torque_wind_down = 100 if lta_active and full_torque_condition else 0
+    #   can_sends.append(toyotacan.create_lta_steer_command(self.packer, self.CP.steerControlType, self.last_angle,
+    #                                                       lta_active, self.frame // 2, torque_wind_down))
 
-      if self.CP.flags & ToyotaFlags.SECOC.value:
-        lta_steer_2 = toyotacan.create_lta_steer_command_2(self.packer, self.frame // 2)
-        lta_steer_2 = add_mac(self.secoc_key,
-                              int(CS.secoc_synchronization['TRIP_CNT']),
-                              int(CS.secoc_synchronization['RESET_CNT']),
-                              self.secoc_lta_message_counter,
-                              lta_steer_2)
-        self.secoc_lta_message_counter += 1
-        can_sends.append(lta_steer_2)
+      # if self.CP.flags & ToyotaFlags.SECOC.value:
+      #   lta_steer_2 = toyotacan.create_lta_steer_command_2(self.packer, self.frame // 2)
+      #   lta_steer_2 = add_mac(self.secoc_key,
+      #                         int(CS.secoc_synchronization['TRIP_CNT']),
+      #                         int(CS.secoc_synchronization['RESET_CNT']),
+      #                         self.secoc_lta_message_counter,
+      #                         lta_steer_2)
+      #   self.secoc_lta_message_counter += 1
+      #   can_sends.append(lta_steer_2)
 
     # *** gas and brake ***
 
@@ -236,18 +236,20 @@ class CarController(CarControllerBase):
           self.permit_braking = False
 
         pcm_accel_cmd = float(np.clip(pcm_accel_cmd, self.params.ACCEL_MIN, self.params.ACCEL_MAX))
-
-        can_sends.append(toyotacan.create_accel_command(self.packer, pcm_accel_cmd, pcm_cancel_cmd, self.permit_braking, self.standstill_req, lead,
-                                                        CS.acc_type, fcw_alert, self.distance_button))
+        #can_sends.append(toyotacan.create_ls_accel_command(self.packer, pcm_accel_cmd, fcw_alert, acc_enable))
+        # can_sends.append(toyotacan.create_accel_command(self.packer, pcm_accel_cmd, pcm_cancel_cmd, self.permit_braking, self.standstill_req, lead,
+        #                                                 CS.acc_type, fcw_alert, self.distance_button))
         self.accel = pcm_accel_cmd
 
     else:
       # we can spam can to cancel the system even if we are using lat only control
       if pcm_cancel_cmd:
         if self.CP.carFingerprint in UNSUPPORTED_DSU_CAR:
-          can_sends.append(toyotacan.create_acc_cancel_command(self.packer))
+          can_sends.append(toyotacan.create_ls_dsu_diag_msg(self.packer, 0x02, 0x21, 0x01))
+          #can_sends.append(toyotacan.create_acc_cancel_command(self.packer))
         else:
-          can_sends.append(toyotacan.create_accel_command(self.packer, 0, pcm_cancel_cmd, True, False, lead, CS.acc_type, False, self.distance_button))
+          can_sends.append(toyotacan.create_ls_dsu_diag_msg(self.packer, 0x02, 0x21, 0x01))
+          #can_sends.append(toyotacan.create_accel_command(self.packer, 0, pcm_cancel_cmd, True, False, lead, CS.acc_type, False, self.distance_button))
 
     # *** hud ui ***
     if self.CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
@@ -263,19 +265,19 @@ class CarController(CarControllerBase):
         # forcing the pcm to disengage causes a bad fault sound so play a good sound instead
         send_ui = True
 
-      if self.frame % 20 == 0 or send_ui:
-        can_sends.append(toyotacan.create_ui_command(self.packer, steer_alert, pcm_cancel_cmd, hud_control.leftLaneVisible,
-                                                     hud_control.rightLaneVisible, hud_control.leftLaneDepart,
-                                                     hud_control.rightLaneDepart, CC.enabled, CS.lkas_hud))
+      # if self.frame % 20 == 0 or send_ui:
+      #   can_sends.append(toyotacan.create_ui_command(self.packer, steer_alert, pcm_cancel_cmd, hud_control.leftLaneVisible,
+      #                                                hud_control.rightLaneVisible, hud_control.leftLaneDepart,
+      #                                                hud_control.rightLaneDepart, CC.enabled, CS.lkas_hud))
 
-      if (self.frame % 100 == 0 or send_ui) and (self.CP.enableDsu or self.CP.flags & ToyotaFlags.DISABLE_RADAR.value):
-        can_sends.append(toyotacan.create_fcw_command(self.packer, fcw_alert))
+      # if (self.frame % 100 == 0 or send_ui) and (self.CP.enableDsu or self.CP.flags & ToyotaFlags.DISABLE_RADAR.value):
+      #   can_sends.append(toyotacan.create_fcw_command(self.packer, fcw_alert))
 
     # *** static msgs ***
-    if self.CP.enableDsu:
-      for addr, cars, bus, fr_step, vl in STATIC_DSU_MSGS:
-        if self.frame % fr_step == 0 and self.CP.carFingerprint in cars:
-          can_sends.append(CanData(addr, vl, bus))
+    # if self.CP.enableDsu:
+    #   for addr, cars, bus, fr_step, vl in STATIC_DSU_MSGS:
+    #     if self.frame % fr_step == 0 and self.CP.carFingerprint in cars:
+    #       can_sends.append(CanData(addr, vl, bus))
     
     # Test sending diagnostic message on drving bus
     # % 20 = 200ms periodic send rate
