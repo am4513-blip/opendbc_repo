@@ -58,7 +58,7 @@ class ToyotaSafetyFlags(IntFlag):
   
   TOYOTA_STEERING_BUS = 4096
   TOYOTA_DRIVING_BUS = 8192
-  TOYOTA_DRIVING_BUS = 16384
+  TOYOTA_BODY_BUS = 16384
 
 
 class ToyotaFlags(IntFlag):
@@ -80,9 +80,9 @@ class ToyotaFlags(IntFlag):
   RAISED_ACCEL_LIMIT = 1024
   SECOC = 2048
   
-  # TOYOTA_STEERING_BUS = 4096
-  # TOYOTA_DRIVING_BUS = 8192
-  # TOYOTA_DRIVING_BUS = 16384
+  TOYOTA_STEERING_BUS = 4096
+  TOYOTA_DRIVING_BUS = 8192
+  TOYOTA_BODY_BUS = 16384
 
 
 def dbc_dict(pt, radar):
