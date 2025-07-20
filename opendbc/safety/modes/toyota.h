@@ -1,50 +1,7 @@
 #pragma once
 
 #include "opendbc/safety/safety_declarations.h"
-
-// Stock longitudinal
-#define TOYOTA_BASE_TX_MSGS \
-  {0x191, 0, 8, .check_relay = true}, {0x412, 0, 8, .check_relay = true}, {0x1D2, 0, 8, .check_relay = false},  /* LKAS + LTA + PCM cancel cmd */  \
-
-#define TOYOTA_COMMON_TX_MSGS \
-  TOYOTA_BASE_TX_MSGS \
-  {0x689, 0, 8, .check_relay = true}, \
-  {0x180, 0, 5, .check_relay = true}, \
-  {0x280, 0, 8, .check_relay = false},  /* ACC cancel cmd */  \
-
-#define TOYOTA_COMMON_SECOC_TX_MSGS \
-  TOYOTA_BASE_TX_MSGS \
-  {0x2E4, 0, 8, .check_relay = true}, {0x131, 0, 8, .check_relay = true}, \
-  {0x343, 0, 8, .check_relay = false},  /* ACC cancel cmd */  \
-
-#define TOYOTA_COMMON_LONG_TX_MSGS \
-  TOYOTA_COMMON_TX_MSGS \
-  /* DSU bus 0 */ \
-  {0x280, 0, 8, .check_relay = true},  \
-  {0x790, 2, 8, .check_relay = flase}, \
-
-#define TOYOTA_COMMON_RX_CHECKS(lta)   \                                                                                                   \ 
-  {.msg = {{0x260, 0, 8, .ignore_counter = true, .ignore_quality_flag=!(lta), .frequency = 50U}, { 0 }, { 0 }}},         \                  \
-
-#define TOYOTA_RX_CHECKS(lta)                                                                                                               \
-  TOYOTA_COMMON_RX_CHECKS(lta)                                                                                                              \
-  {.msg = {{ 0xB0, 0, 8, .ignore_checksum = true, .frequency = 83U}, { 0 }, { 0 }}},                               \                                                \
-  {.msg = {{ 0xB2, 0, 8, .ignore_checksum = true, .frequency = 83U}, { 0 }, { 0 }}},                               \                                                    \
-  {.msg = {{0x689, 1, 8, .frequency = 1U}, { 0 }, { 0 }}},                                                         \
-  {.msg = {{0x2C1, 0, 8, .frequency = 31U}, { 0 }, { 0 }}},                                                        \
-  //{.msg = {{0x1D2, 0, 8, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 33U}, { 0 }, { 0 }}},                            \
-  //{.msg = {{0x226, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 40U},  { 0 }, { 0 }}},  \
-
-#define TOYOTA_ALT_BRAKE_RX_CHECKS(lta)                                                                                                    \
-  TOYOTA_COMMON_RX_CHECKS(lta)                                                                                                             \                           
-  {.msg = {{0x224, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 40U}, { 0 }, { 0 }}},  \
-
-#define TOYOTA_SECOC_RX_CHECKS                                                                                                             \
-  TOYOTA_COMMON_RX_CHECKS(false)                                                                                                           \
-  {.msg = {{0x176, 0, 8, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 32U}, { 0 }, { 0 }}},                           \
-  {.msg = {{0x116, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 42U}, { 0 }, { 0 }}},  \
-  {.msg = {{0x101, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}},  \
-
+                                                     
 static bool toyota_secoc = false;
 static bool toyota_alt_brake = false;
 static bool toyota_stock_longitudinal = false;
@@ -375,17 +332,25 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
 }
 
 static safety_config toyota_init(uint16_t param) {
-  static const CanMsg TOYOTA_TX_MSGS[] = {
-    TOYOTA_COMMON_TX_MSGS
-  };
 
-  static const CanMsg TOYOTA_SECOC_TX_MSGS[] = {
-    TOYOTA_COMMON_SECOC_TX_MSGS
-  };
+    
+  static const CanMsg TOYOTA_STR_TX_MSGS[] = {{0x180, 0, 5}};  //STEERING COMMAND
 
-  static const CanMsg TOYOTA_LONG_TX_MSGS[] = {
-    TOYOTA_COMMON_LONG_TX_MSGS
-  };
+  // DSU_DIAG_REQ_MSG would not get sent out until the CAN BUS was changed to CAN 2
+  static const CanMsg TOYOTA_DRV_TX_MSGS[] = {{0x280, 0, 8}, {0x790, 2, 8} };  // ACC_COMMAND and DSU DIAG REQ MSG
+
+  static const CanMsg TOYOTA_BDY_TX_MSGS[] = {{0x689, 0, 8}};  //RADAR ACTIVE
+  // static const CanMsg TOYOTA_TX_MSGS[] = {
+  //   TOYOTA_COMMON_TX_MSGS
+  // };
+
+  // static const CanMsg TOYOTA_SECOC_TX_MSGS[] = {
+  //   TOYOTA_COMMON_SECOC_TX_MSGS
+  // };
+
+  // static const CanMsg TOYOTA_LONG_TX_MSGS[] = {
+  //   TOYOTA_COMMON_LONG_TX_MSGS
+  // };
 
   // safety param flags
   // first byte is for EPS factor, second is for flags
@@ -414,43 +379,60 @@ static safety_config toyota_init(uint16_t param) {
   toyota_body_bus = GET_FLAG(param, TOYOTA_FLAG_BODY_BUS);
 
   safety_config ret;
-  if (toyota_stock_longitudinal) {
-    if (toyota_secoc) {
-      SET_TX_MSGS(TOYOTA_SECOC_TX_MSGS, ret);
-    } else {
-      SET_TX_MSGS(TOYOTA_TX_MSGS, ret);
-    }
-  } else {
-    SET_TX_MSGS(TOYOTA_LONG_TX_MSGS, ret);
+
+  SET_TX_MSGS(TOYOTA_STR_TX_MSGS, ret);
+  SET_TX_MSGS(TOYOTA_DRV_TX_MSGS, ret);
+  SET_TX_MSGS(TOYOTA_BDY_TX_MSGS, ret);
+
+  static RxCheck toyota_lta_rx_checks[] = {
+    {.msg = {{0x260, 0, 8, .ignore_counter = true, .ignore_quality_flag=!(true), .frequency = 50U}, { 0 }, { 0 }}},                                                                                                               \                                                                                                             \
+    {.msg = {{ 0xB0, 0, 8, .ignore_checksum = true, .frequency = 83U}, { 0 }, { 0 }}},                                                   
+    {.msg = {{ 0xB2, 0, 8, .ignore_checksum = true, .frequency = 83U}, { 0 }, { 0 }}},                                                                                   \
+    {.msg = {{0x689, 1, 8, .frequency = 1U}, { 0 }, { 0 }}},                                                         
+    {.msg = {{0x2C1, 0, 8, .frequency = 31U}, { 0 }, { 0 }}},
+    {.msg = {{0x224, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 40U}, { 0 }, { 0 }}},
   }
 
-  if (toyota_secoc) {
-    static RxCheck toyota_secoc_rx_checks[] = {
-      TOYOTA_SECOC_RX_CHECKS
-    };
+  SET_RX_CHECKS(toyota_lta_rx_checks, ret);
 
-    SET_RX_CHECKS(toyota_secoc_rx_checks, ret);
-  } else if (toyota_lta) {
-    // Check the quality flag for angle measurement when using LTA, since it's not set on TSS-P cars
-    static RxCheck toyota_lta_rx_checks[] = {
-      TOYOTA_RX_CHECKS(true)
-    };
 
-    SET_RX_CHECKS(toyota_lta_rx_checks, ret);
-  } else {
-    static RxCheck toyota_lka_rx_checks[] = {
-      TOYOTA_RX_CHECKS(false)
-    };
-    static RxCheck toyota_lka_alt_brake_rx_checks[] = {
-      TOYOTA_ALT_BRAKE_RX_CHECKS(false)
-    };
+  // if (toyota_stock_longitudinal) {
+  //   if (toyota_secoc) {
+  //     SET_TX_MSGS(TOYOTA_SECOC_TX_MSGS, ret);
+  //   } else {
+  //     SET_TX_MSGS(TOYOTA_TX_MSGS, ret);
+  //   }
+  // } else {
+  //   SET_TX_MSGS(TOYOTA_LONG_TX_MSGS, ret);
+  // }
 
-    if (!toyota_alt_brake) {
-      SET_RX_CHECKS(toyota_lka_rx_checks, ret);
-    } else {
-      SET_RX_CHECKS(toyota_lka_alt_brake_rx_checks, ret);
-    }
-  }
+  // if (toyota_secoc) {
+  //   static RxCheck toyota_secoc_rx_checks[] = {
+  //     TOYOTA_SECOC_RX_CHECKS
+  //   };
+
+  //   SET_RX_CHECKS(toyota_secoc_rx_checks, ret);
+  // } else if (toyota_lta) {
+  //   // Check the quality flag for angle measurement when using LTA, since it's not set on TSS-P cars
+  //   static RxCheck toyota_lta_rx_checks[] = {
+  //     TOYOTA_RX_CHECKS(true)
+  //   };
+
+  //   SET_RX_CHECKS(toyota_lta_rx_checks, ret);
+  // } else {
+  //   static RxCheck toyota_lka_rx_checks[] = {
+  //     TOYOTA_RX_CHECKS(false)
+  //   };
+  //   static RxCheck toyota_lka_alt_brake_rx_checks[] = {
+  //     TOYOTA_ALT_BRAKE_RX_CHECKS(false)
+  //   };
+
+  //   if (!toyota_alt_brake) {
+  //     SET_RX_CHECKS(toyota_lka_rx_checks, ret);
+  //   } else {
+  //     SET_RX_CHECKS(toyota_lka_alt_brake_rx_checks, ret);
+  //   }
+  // }
 
   return ret;
 }
