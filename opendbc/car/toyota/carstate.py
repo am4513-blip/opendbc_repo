@@ -160,7 +160,7 @@ class CarState(CarStateBase):
       #ret.cruiseState.available = cp.vl["PCM_CRUISE_2"]["MAIN_ON"] != 0
       ret.cruiseState.available = cp_alt.vl["PCM_CRUISE"]["RADAR_READY"] != 0
       #ret.cruiseState.speed = cp.vl["PCM_CRUISE_2"]["SET_SPEED"] * CV.KPH_TO_MS
-      ret.cruiseState.speed = cp_bdy.vl["PCM_CRUISE"]["UI_SET_SPEED"] * CV.MPH_TO_MS ##################################
+      ret.cruiseState.speed = cp_alt.vl["PCM_CRUISE"]["UI_SET_SPEED"] * CV.MPH_TO_MS ##################################
       cluster_set_speed = 0 #cp.vl["PCM_CRUISE_SM"]["UI_SET_SPEED"]
 
     # UI_SET_SPEED is always non-zero when main is on, hide until first enable
@@ -188,7 +188,7 @@ class CarState(CarStateBase):
       # ignore standstill state in certain vehicles, since pcm allows to restart with just an acceleration request
       ret.cruiseState.standstill = self.pcm_acc_status == 7
     #ret.cruiseState.enabled = bool(cp.vl["PCM_CRUISE"]["CRUISE_ACTIVE"])
-    ret.cruiseState.enabled = bool(cp_bdy.vl["PCM_CRUISE"]["CRUISE_ACTIVE"])
+    ret.cruiseState.enabled = bool(cp_alt.vl["PCM_CRUISE"]["CRUISE_ACTIVE"])
     #ret.cruiseState.nonAdaptive = self.pcm_acc_status in (1, 2, 3, 4, 5, 6)
 
     ret.genericToggle = bool(cp_drv.vl["LIGHT_STALK"]["AUTO_HIGH_BEAM"])
