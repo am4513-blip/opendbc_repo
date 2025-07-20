@@ -235,12 +235,16 @@ class CarState(CarStateBase):
     
     bdy_messages = []
     bdy_messages += [ ("ESP_CONTROL", 3),     #0x3B7 Gatewayed from Body BUS
-                      ("PCM_CRUISE", 1), ]    #0x689 
+                      ("PCM_CRUISE", 1), ]    #0x689
+    
+    crs_message = []
+    crs_messages += [("PCM_CRUISE", 1), ]    #0x689
 
 
 
     return {
       Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], str_messages, 0),
       Bus.drv: CANParser(DBC[CP.carFingerprint][Bus.pt], drv_messages, 4),
-      Bus.body: CANParser(DBC[CP.carFingerprint][Bus.pt], bdy_messages, 5),
+      Bus.body: CANParser(DBC[CP.carFingerprint][Bus.pt], bdy_messages, 8),
+      Bus.alt: CANParser(DBC[CP.carFingerprint][Bus.pt], crs_messages, 1),
     }
