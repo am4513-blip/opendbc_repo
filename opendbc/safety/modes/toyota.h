@@ -339,7 +339,7 @@ static safety_config toyota_init(uint16_t param) {
   static const CanMsg TOYOTA_STR_TX_MSGS[] = {{0x180, 0, 5, .check_relay = true}};  //STEERING COMMAND
 
   // DSU_DIAG_REQ_MSG would not get sent out until the CAN BUS was changed to CAN 2
-  static const CanMsg TOYOTA_DRV_TX_MSGS[] = {{0x280, 0, 8, .check_relay = true}, {0x790, 2, 8} };  // ACC_COMMAND and DSU DIAG REQ MSG
+  static const CanMsg TOYOTA_DRV_TX_MSGS[] = {{0x280, 0, 8, .check_relay = true}, {0x790, 2, 8, .check_relay = false} };  // ACC_COMMAND and DSU DIAG REQ MSG
 
   static const CanMsg TOYOTA_BDY_TX_MSGS[] = {{0x689, 0, 8, .check_relay = true}};  //RADAR ACTIVE
   // static const CanMsg TOYOTA_TX_MSGS[] = {
