@@ -56,6 +56,34 @@ def create_accel_command(packer, accel, pcm_cancel, permit_braking, standstill_r
   return packer.make_can_msg("ACC_CONTROL", 0, values)
 
 
+def create_ls_accel_command(packer, accel, fcw_alert, acc_enable):
+  # TODO: find the exact canceling bit that does not create a chime
+  values = {
+    "ACCEL_CMD": accel,
+    "ACCEL_CMD2": accel,
+    "ACCEL_ENABLE": acc_enable,
+    "ACC_CUT_IN": fcw_alert,  # only shown when ACC enabled
+  }
+  return packer.make_can_msg("ACC_COMMAND", 4, values)
+
+def create_ls_pcm_cruise_command(packer, radar_ready, cruise_active, ui_set_speed):
+  # TODO: find the exact canceling bit that does not create a chime
+  values = {
+    "CRUISE_ACTIVE": cruise_active,
+    "RADAR_READY":   radar_ready,
+    "UI_SET_SPEED":  ui_set_speed,
+  }
+  return packer.make_can_msg("PCM_CRUISE", 8, values)  #send on CAN 0 of 3rd Panda (CAN8)
+
+
+def create_ls_dsu_diag_msg(packer, pci, sid, pid):
+  values = {
+    "PCI_REQ": pci,
+    "SID_REQ": sid,
+    "PID_REQ": pid,
+  }
+  return packer.make_can_msg("DSU_DIAG_REQ_MSG", 6, values)
+
 def create_pcs_commands(packer, accel, active, mass):
   values1 = {
     "COUNTER": 0,

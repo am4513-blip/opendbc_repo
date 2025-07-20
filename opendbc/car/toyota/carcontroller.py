@@ -276,10 +276,15 @@ class CarController(CarControllerBase):
       for addr, cars, bus, fr_step, vl in STATIC_DSU_MSGS:
         if self.frame % fr_step == 0 and self.CP.carFingerprint in cars:
           can_sends.append(CanData(addr, vl, bus))
+    
+    # Test sending diagnostic message on drving bus
+    # % 20 = 200ms periodic send rate
+    if self.frame % 20 == 0:
+      can_sends.append(toyotacan.create_ls_dsu_diag_msg(self.packer, 0x02, 0x21, 0x01))
 
     # keep radar disabled
-    if self.frame % 20 == 0 and self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
-      can_sends.append(make_tester_present_msg(0x750, 0, 0xF))
+    # if self.frame % 20 == 0 and self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
+    #   can_sends.append(make_tester_present_msg(0x750, 0, 0xF))
 
     new_actuators = actuators.as_builder()
     new_actuators.torque = apply_torque / self.params.STEER_MAX
