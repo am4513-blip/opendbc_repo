@@ -287,6 +287,9 @@ class CarState(CarStateBase):
     
     crs_messages = []
     crs_messages += [("PCM_CRUISE", 1),]    #Msg 0x689 DSU sends on CAN 10. OP blocks, but Tx's its own msg on CAN 8.
+    
+    cc_stalk_messages = []
+    cc_stalk_messages += [("DSU_DIAG_RESP_MSG", 5),]    #0x798 Diag Resp Msg From DSU on Driving BUS (CAN 6)
 
 
 
@@ -295,4 +298,5 @@ class CarState(CarStateBase):
       Bus.drv: CANParser(DBC[CP.carFingerprint][Bus.pt], drv_messages, 4),
       Bus.body: CANParser(DBC[CP.carFingerprint][Bus.pt], bdy_messages, 8),
       Bus.alt: CANParser(DBC[CP.carFingerprint][Bus.pt], crs_messages, 1),
+      Bus.dsu_drv: CANParser(DBC[CP.carFingerprint][Bus.pt], cc_stalk_messages, 6),
     }
