@@ -32,6 +32,14 @@ class CarState(CarStateBase):
     self.eps_torque_scale = EPS_SCALE[CP.carFingerprint] / 100.
     self.cluster_speed_hyst_gap = CV.KPH_TO_MS / 2.
     self.cluster_min_speed = CV.KPH_TO_MS / 2.
+    
+    self.radar_ready = False
+    self.cruise_active = False
+    self.cc_main_sw_prev_st = False
+    self.cc_res_acc_sw_prev_st = False
+    self.cc_set_coast_sw_prev_st = False
+    self.cc_set_speed = 25  #default cruise set speed when first activated
+    self.cc_first_act = False   #when false, cc has not been activated previously. set to false when MAIN is turned OFF
 
     if CP.flags & ToyotaFlags.SECOC.value:
       self.shifter_values = can_define.dv["GEAR_PACKET_HYBRID"]["GEAR"]
@@ -59,6 +67,7 @@ class CarState(CarStateBase):
     cp_drv = can_parsers[Bus.drv]
     cp_bdy = can_parsers[Bus.body]
     cp_alt = can_parsers[Bus.alt]
+    cp_dsu_drv = can_parsers[Bus.dsu_drv]
 
     ret = structs.CarState()
     #cp_acc = cp_cam if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR) else cp
@@ -162,6 +171,45 @@ class CarState(CarStateBase):
       #ret.cruiseState.speed = cp.vl["PCM_CRUISE_2"]["SET_SPEED"] * CV.KPH_TO_MS
       ret.cruiseState.speed = cp_alt.vl["PCM_CRUISE"]["UI_SET_SPEED"] * CV.MPH_TO_MS ##################################
       cluster_set_speed = 0 #cp.vl["PCM_CRUISE_SM"]["UI_SET_SPEED"]
+      
+        # Process cruise control stalk button SET/COAST, RES/ACC, MAIN ON/OFF button states
+    # if cp_dsu_drv.vl["DSU_DIAG_RESP_MSG"]["SID_RESP"] == 0x61 and cp_dsu_drv.vl["DSU_DIAG_RESP_MSG"]["PID_RESP"] == 0x01:
+      #Check MAIN Button Status
+    if cp_dsu_drv.vl["DSU_DIAG_RESP_MSG"]["CC_MAIN_SW_STAT"] == 1:
+      if self.cc_main_sw_prev_st == False:
+        self.radar_ready = not self.radar_ready #If False, set to True and vice versa
+        if self.radar_ready == False:
+          self.cc_first_act = False
+          self.cruise_active = False
+        self.cc_main_sw_prev_st = True
+        
+    elif cp_dsu_drv.vl["DSU_DIAG_RESP_MSG"]["CC_RES_ACC_SW_STAT"] == 1:
+      if self.cc_res_acc_sw_prev_st == False:
+        if self.radar_ready and self.cc_first_act and self.cruise_active:
+          self.cc_set_speed += 5
+          if self.cc_set_speed > 90:
+            self.cc_set_speed = 90
+          self.cruise_active = True
+        elif self.radar_ready and self.cc_first_act and self.cruise_active == False:
+          self.cruise_active = True
+        self.cc_res_acc_sw_prev_st = True
+
+    elif cp_dsu_drv.vl["DSU_DIAG_RESP_MSG"]["CC_SET_COAST_SW_STAT"] == 1:
+      if self.cc_set_coast_sw_prev_st == False:
+        if self.radar_ready and self.cruise_active: #has been act'd previously and radar ready and cc active
+          self.cc_set_speed -= 5
+          if self.cc_set_speed < 25:
+            self.cc_set_speed = 25
+          self.cc_set_coast_sw_prev_st = True
+        elif self.radar_ready and self.cruise_active == False: #has not been act'd previously and radar ready
+          self.cc_set_speed = (  round(((ret.wheelSpeeds.fl * CV.MS_TO_MPH) + 5)/5) * 5.0) #(round((ret.vEgoRaw * 0.6213712) / 5.0) * 5.0)  # round to the nearest 5,  1kmh =  0.6213712 mph
+          self.cc_first_act = True
+          self.cruise_active = True
+          
+    else: # Make sure button states are set to False when there is no stalk pressed
+      self.cc_main_sw_prev_st = False
+      self.cc_set_coast_sw_prev_st = False
+      self.cc_res_acc_sw_prev_st = False
 
     # UI_SET_SPEED is always non-zero when main is on, hide until first enable
     if ret.cruiseState.speed != 0:
