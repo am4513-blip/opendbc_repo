@@ -150,7 +150,7 @@ class CarController(CarControllerBase):
     #                           steer_command)
     #   self.secoc_lka_message_counter += 1
     can_sends.append(steer_command)
-    print("can_sends: ", can_sends)
+    
 
     # # STEERING_LTA does not seem to allow more rate by sending faster, and may wind up easier
     # if self.frame % 2 == 0 and self.CP.carFingerprint in TSS2_CAR:
@@ -190,7 +190,7 @@ class CarController(CarControllerBase):
     fcw_alert = hud_control.visualAlert == VisualAlert.fcw
     steer_alert = hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw)
     lead = hud_control.leadVisible or CS.out.vEgo < 12.  # at low speed we always assume the lead is present so ACC can be engaged
-
+    print("OP_LC: ", self.CP.openpilotLongitudinalControl)
     if self.CP.openpilotLongitudinalControl:
       if self.frame % 3 == 0:
         # # Press distance button until we are at the correct bar length. Only change while enabled to avoid skipping startup popup
