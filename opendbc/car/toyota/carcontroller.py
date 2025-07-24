@@ -185,12 +185,12 @@ class CarController(CarControllerBase):
       self.standstill_req = False
 
     self.last_standstill = CS.out.standstill
-
+    pcm_accel_cmd = float(np.clip(actuators.accel, self.params.ACCEL_MIN, self.params.ACCEL_MAX))
     # handle UI messages
     fcw_alert = hud_control.visualAlert == VisualAlert.fcw
     steer_alert = hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw)
     lead = hud_control.leadVisible or CS.out.vEgo < 12.  # at low speed we always assume the lead is present so ACC can be engaged
-    print("OP_LC: ", self.CP.openpilotLongitudinalControl)
+
     if self.CP.openpilotLongitudinalControl:
       if self.frame % 3 == 0:
         # # Press distance button until we are at the correct bar length. Only change while enabled to avoid skipping startup popup
@@ -204,8 +204,8 @@ class CarController(CarControllerBase):
         # internal PCM gas command can get stuck unwinding from negative accel so we apply a generous rate limit
         pcm_accel_cmd = actuators.accel
         # if CC.longActive:
-        #   pcm_accel_cmd = rate_limit(pcm_accel_cmd, self.prev_accel, ACCEL_WINDDOWN_LIMIT, ACCEL_WINDUP_LIMIT)
-        # self.prev_accel = pcm_accel_cmd
+        # #   pcm_accel_cmd = rate_limit(pcm_accel_cmd, self.prev_accel, ACCEL_WINDDOWN_LIMIT, ACCEL_WINDUP_LIMIT)
+        self.prev_accel = pcm_accel_cmd
 
         # calculate amount of acceleration PCM should apply to reach target, given pitch.
         # clipped to only include downhill angles, avoids erroneously unsetting PERMIT_BRAKING when stopping on uphills

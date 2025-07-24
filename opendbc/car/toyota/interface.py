@@ -127,15 +127,16 @@ class CarInterface(CarInterfaceBase):
     #  - TSS2 cars with camera sending ACC_CONTROL where we can block it
     # openpilot longitudinal behind experimental long toggle:
     #  - TSS2 radar ACC cars (disables radar)
-
-    if ret.flags & ToyotaFlags.SECOC.value:
-      ret.openpilotLongitudinalControl = False
-    else:
-      ret.openpilotLongitudinalControl = ret.enableDsu or \
-        candidate in (TSS2_CAR - RADAR_ACC_CAR) or \
-        bool(ret.flags & ToyotaFlags.DISABLE_RADAR.value)
-
-    ret.autoResumeSng = ret.openpilotLongitudinalControl and candidate in NO_STOP_TIMER_CAR
+    ########### LEXUS LS set long Control to True ################
+    ret.openpilotLongitudinalControl = True
+    # if ret.flags & ToyotaFlags.SECOC.value:
+    #   ret.openpilotLongitudinalControl = False
+    # else:
+    #   ret.openpilotLongitudinalControl = ret.enableDsu or \
+    #     candidate in (TSS2_CAR - RADAR_ACC_CAR) or \
+    #     bool(ret.flags & ToyotaFlags.DISABLE_RADAR.value)
+    ########### LEXUS LS set autoResumeSnG to True ################
+    ret.autoResumeSng = True #ret.openpilotLongitudinalControl and candidate in NO_STOP_TIMER_CAR
 
     if not ret.openpilotLongitudinalControl:
       ret.safetyConfigs[0].safetyParam |= ToyotaSafetyFlags.STOCK_LONGITUDINAL.value
