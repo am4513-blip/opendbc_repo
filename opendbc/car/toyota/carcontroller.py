@@ -291,16 +291,16 @@ class CarController(CarControllerBase):
     #       can_sends.append(CanData(addr, vl, bus))
     
     
-    # Send diagnostic message on drving bus for stalk button status
+    # Send diagnostic message on drving bus (CAN 6) to get CC stalk button status
     # % 20 = 200ms periodic send rate
     if self.frame % 20 == 0:
       can_sends.append(toyotacan.create_ls_dsu_diag_msg(self.packer, 0x02, 0x21, 0x01))
-      print("can_sends: ", can_sends)
       
      # Send CAN message from DSU to clsuter (0x689) 
-    # if (self.frame % 100 == 0): #or send_ui):
-    #   can_sends.append(toyotacan.create_ls_pcm_cruise_command(self.packer, CS.radar_ready, CS.cruise_active, CS.cc_set_speed))
-    #   self.prev_set_speed = CS.cc_set_speed
+    if (self.frame % 100 == 0): #or send_ui):
+      can_sends.append(toyotacan.create_ls_pcm_cruise_command(self.packer, CS.radar_ready, CS.cruise_active, CS.cc_set_speed))
+      self.prev_set_speed = CS.cc_set_speed
+      print("can_sends: ", can_sends)
 
     # keep radar disabled
     # if self.frame % 20 == 0 and self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
