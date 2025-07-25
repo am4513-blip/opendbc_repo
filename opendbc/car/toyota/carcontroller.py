@@ -72,15 +72,15 @@ class CarController(CarControllerBase):
 
     self.packer = CANPacker(dbc_names[Bus.pt])
 
-    self.secoc_lka_message_counter = 0
-    self.secoc_lta_message_counter = 0
-    self.secoc_prev_reset_counter = 0
+    # self.secoc_lka_message_counter = 0
+    # self.secoc_lta_message_counter = 0
+    # self.secoc_prev_reset_counter = 0
 
   def update(self, CC, CS, now_nanos):
     actuators = CC.actuators
     stopping = actuators.longControlState == LongCtrlState.stopping
-    hud_control = CC.hudControl
-    pcm_cancel_cmd = CC.cruiseControl.cancel
+    #hud_control = CC.hudControl
+    #pcm_cancel_cmd = CC.cruiseControl.cancel
     if CC.enabled:
       acc_enable = 132
       if self.prev_set_speed != CS.cc_set_speed:
@@ -93,8 +93,8 @@ class CarController(CarControllerBase):
     
     
 
-    if len(CC.orientationNED) == 3:
-      self.pitch.update(CC.orientationNED[1])
+    # if len(CC.orientationNED) == 3:
+    #   self.pitch.update(CC.orientationNED[1])
 
     # *** control msgs ***
     can_sends = []
@@ -150,7 +150,6 @@ class CarController(CarControllerBase):
     #                           steer_command)
     #   self.secoc_lka_message_counter += 1
     can_sends.append(steer_command)
-    
 
     # # STEERING_LTA does not seem to allow more rate by sending faster, and may wind up easier
     # if self.frame % 2 == 0 and self.CP.carFingerprint in TSS2_CAR:
@@ -187,9 +186,9 @@ class CarController(CarControllerBase):
     self.last_standstill = CS.out.standstill
     pcm_accel_cmd = float(np.clip(actuators.accel, self.params.ACCEL_MIN, self.params.ACCEL_MAX))
     # handle UI messages
-    fcw_alert = hud_control.visualAlert == VisualAlert.fcw
-    steer_alert = hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw)
-    lead = hud_control.leadVisible or CS.out.vEgo < 12.  # at low speed we always assume the lead is present so ACC can be engaged
+    fcw_alert = False #hud_control.visualAlert == VisualAlert.fcw
+    # steer_alert = hud_control.visualAlert in (VisualAlert.steerRequired, VisualAlert.ldw)
+    # lead = hud_control.leadVisible or CS.out.vEgo < 12.  # at low speed we always assume the lead is present so ACC can be engaged
 
     if self.CP.openpilotLongitudinalControl:
       if self.frame % 3 == 0:
@@ -255,14 +254,14 @@ class CarController(CarControllerBase):
 
     else:
       # we can spam can to cancel the system even if we are using lat only control
-      if pcm_cancel_cmd:
-        if self.CP.carFingerprint in UNSUPPORTED_DSU_CAR:
-          can_sends.append(toyotacan.create_ls_accel_command(self.packer, pcm_accel_cmd, fcw_alert, acc_enable))
-          #can_sends.append(toyotacan.create_acc_cancel_command(self.packer))
-        else:
-          can_sends.append(toyotacan.create_ls_accel_command(self.packer, pcm_accel_cmd, fcw_alert, acc_enable))
+      # if pcm_cancel_cmd:
+      #   if self.CP.carFingerprint in UNSUPPORTED_DSU_CAR:
+      #     can_sends.append(toyotacan.create_ls_accel_command(self.packer, pcm_accel_cmd, fcw_alert, acc_enable))
+      #     #can_sends.append(toyotacan.create_acc_cancel_command(self.packer))
+      #   else:
+      #     can_sends.append(toyotacan.create_ls_accel_command(self.packer, pcm_accel_cmd, fcw_alert, acc_enable))
           #can_sends.append(toyotacan.create_accel_command(self.packer, 0, pcm_cancel_cmd, True, False, lead, CS.acc_type, False, self.distance_button))
-
+      can_sends.append(toyotacan.create_ls_accel_command(self.packer, pcm_accel_cmd, fcw_alert, acc_enable))
     # *** hud ui ***
     # if self.CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
     #   # ui mesg is at 1Hz but we send asap if:
