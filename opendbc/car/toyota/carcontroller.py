@@ -294,8 +294,8 @@ class CarController(CarControllerBase):
     # Send diagnostic message on drving bus (CAN 6) to get CC stalk button status
     # % 20 = 200ms periodic send rate
     if self.frame % 20 == 0: # 5 times per second
-      #can_sends.append(toyotacan.create_ls_dsu_diag_msg(self.packer, 2, 4, 1))
-      can_sends.append([0x790, 6, b"\x02\x21\x01\x00\x00\x00\x00\x00", 0])
+      can_sends.append(toyotacan.create_ls_dsu_diag_msg(self.packer, 2, 0x21, 1))
+      #can_sends.append([0x790, 6, b"\x02\x21\x01\x00\x00\x00\x00\x00", 0])
       
      # Send CAN message from DSU to clsuter (0x689) 
     if (self.frame % 50 == 0): #or send_ui):  # 2 times per second
