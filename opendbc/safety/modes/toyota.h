@@ -148,21 +148,21 @@ static void toyota_rx_hook(const CANPacket_t *to_push) {
 
 
 static bool toyota_tx_hook(const CANPacket_t *to_send) {
-  const TorqueSteeringLimits TOYOTA_TORQUE_STEERING_LIMITS = {
-    .max_torque = 1100,
-    .max_rate_up = 10,          // ramp up slow
-    .max_rate_down = 10,        // ramp down fast
-    .max_torque_error = 350,    // max torque cmd in excess of motor torque
-    .max_rt_delta = 450,        // the real time limit is 1800/sec, a 20% buffer
-    .type = TorqueMotorLimited,
+  // const TorqueSteeringLimits TOYOTA_TORQUE_STEERING_LIMITS = {
+  //   .max_torque = 1100,
+  //   .max_rate_up = 10,          // ramp up slow
+  //   .max_rate_down = 10,        // ramp down fast
+  //   .max_torque_error = 350,    // max torque cmd in excess of motor torque
+  //   .max_rt_delta = 450,        // the real time limit is 1800/sec, a 20% buffer
+  //   .type = TorqueMotorLimited,
 
-    // the EPS faults when the steering angle rate is above a certain threshold for too long. to prevent this,
-    // we allow setting STEER_REQUEST bit to 0 while maintaining the requested torque value for a single frame
-    .min_valid_request_frames = 18,
-    .max_invalid_request_frames = 1,
-    .min_valid_request_rt_interval = 171000,  // 171ms; a ~10% buffer on cutting every 19 frames
-    .has_steer_req_tolerance = true,
-  };
+  //   // the EPS faults when the steering angle rate is above a certain threshold for too long. to prevent this,
+  //   // we allow setting STEER_REQUEST bit to 0 while maintaining the requested torque value for a single frame
+  //   .min_valid_request_frames = 18,
+  //   .max_invalid_request_frames = 1,
+  //   .min_valid_request_rt_interval = 171000,  // 171ms; a ~10% buffer on cutting every 19 frames
+  //   .has_steer_req_tolerance = true,
+  // };
 
   // static const AngleSteeringLimits TOYOTA_ANGLE_STEERING_LIMITS = {
   //   // LTA angle limits
@@ -183,10 +183,10 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
   //const int TOYOTA_LTA_MAX_DRIVER_TORQUE = 150;
 
   // longitudinal limits
-  const LongitudinalLimits TOYOTA_LONG_LIMITS = {
-    .max_accel = 2000,   // 2.0 m/s2
-    .min_accel = -3500,  // -3.5 m/s2
-  };
+  // const LongitudinalLimits TOYOTA_LONG_LIMITS = {
+  //   .max_accel = 2000,   // 2.0 m/s2
+  //   .min_accel = -3500,  // -3.5 m/s2
+  // };
 
   bool tx = true;
   // int addr = GET_ADDR(to_send);
