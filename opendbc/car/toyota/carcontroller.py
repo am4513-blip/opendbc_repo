@@ -140,7 +140,7 @@ class CarController(CarControllerBase):
     # toyota can trace shows STEERING_LKA at 42Hz, with counter adding alternatively 1 and 2;
     # sending it at 100Hz seem to allow a higher rate limit, as the rate limit seems imposed
     # on consecutive messages
-    steer_command = toyotacan.create_steer_command(self.packer, apply_torque, apply_steer_req)
+    #steer_command = toyotacan.create_steer_command(self.packer, apply_torque, apply_steer_req)
     # if self.CP.flags & ToyotaFlags.SECOC.value:
     #   # TODO: check if this slow and needs to be done by the CANPacker
     #   steer_command = add_mac(self.secoc_key,
@@ -295,7 +295,11 @@ class CarController(CarControllerBase):
     # % 20 = 200ms periodic send rate
     if self.frame % 20 == 0: # 5 times per second
       #can_sends.append(toyotacan.create_ls_accel_command(self.packer, pcm_accel_cmd, fcw_alert, acc_enable))
-      can_sends.append(toyotacan.create_ls_dsu_diag_msg(self.packer, 0x02, 0x21, 1))
+      pci = 0x02
+      sid = 0x21
+      pid = 0x01
+      can_sends.append(toyotacan.create_ls_dsu_diag_msg(self.packer, pci, sid, pid))
+      print("can_sends: ", can_sends)
       
       #can_sends.append([0x790, 6, b"\x02\x21\x01\x00\x00\x00\x00\x00", 0])
       
