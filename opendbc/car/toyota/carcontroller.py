@@ -98,7 +98,7 @@ class CarController(CarControllerBase):
 
     # *** control msgs ***
     can_sends = []
-
+    print("can_sends: ", can_sends)
     # *** handle secoc reset counter increase ***
     # if self.CP.flags & ToyotaFlags.SECOC.value:
     #   if CS.secoc_synchronization['RESET_CNT'] != self.secoc_prev_reset_counter:
