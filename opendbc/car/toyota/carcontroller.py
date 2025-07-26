@@ -98,7 +98,7 @@ class CarController(CarControllerBase):
 
     # *** control msgs ***
     can_sends = []
-    print("can_sends: ", can_sends)
+    
     # *** handle secoc reset counter increase ***
     # if self.CP.flags & ToyotaFlags.SECOC.value:
     #   if CS.secoc_synchronization['RESET_CNT'] != self.secoc_prev_reset_counter:
@@ -150,7 +150,7 @@ class CarController(CarControllerBase):
     #                           steer_command)
     #   self.secoc_lka_message_counter += 1
     can_sends.append(steer_command)
-
+    print("can_sends: ", can_sends)
     # # STEERING_LTA does not seem to allow more rate by sending faster, and may wind up easier
     # if self.frame % 2 == 0 and self.CP.carFingerprint in TSS2_CAR:
     #   lta_active = lat_active and self.CP.steerControlType == SteerControlType.angle
