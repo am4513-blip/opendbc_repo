@@ -189,8 +189,8 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
   // };
 
   bool tx = true;
-  // int addr = GET_ADDR(to_send);
-  // int bus = GET_BUS(to_send);
+  int addr = GET_ADDR(to_send);
+  int bus = GET_BUS(to_send);
 
   // Check if msg is sent on BUS 0 of the driving bus
   // if (bus == 0) {
@@ -315,6 +315,10 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
   //   }
   // }
 
+  if(bus)
+    tx = 1;
+  if (addr)
+    tx  = 1;
   if(toyota_body_bus)
   {
     tx = 1;
