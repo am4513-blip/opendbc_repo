@@ -298,10 +298,11 @@ class CarController(CarControllerBase):
       pci = 0x02
       sid = 0x21
       pid = 0x01
-      can_sends.append(toyotacan.create_ls_dsu_diag_msg(self.packer, pci, sid, pid))
+      #can_sends.append(toyotacan.create_ls_dsu_diag_msg(self.packer, pci, sid, pid))
+      can_sends.append(CanData(0x790, b"\x02\x21\x01\x00\x00\x00\x00\x00", 6))
       print("can_sends: ", can_sends)
       
-      #can_sends.append([0x790, 6, b"\x02\x21\x01\x00\x00\x00\x00\x00", 0])
+      #can_sends.append([0x790, 6, b"\x02\x21\x01\x00\x00\x00\x00\x00", 6])
       
      # Send CAN message from DSU to clsuter (0x689) 
     # if (self.frame % 50 == 0): #or send_ui):  # 2 times per second
