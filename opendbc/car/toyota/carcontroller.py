@@ -149,7 +149,7 @@ class CarController(CarControllerBase):
     #                           self.secoc_lka_message_counter,
     #                           steer_command)
     #   self.secoc_lka_message_counter += 1
-    can_sends.append(steer_command)
+    #can_sends.append(steer_command)
 
     # # STEERING_LTA does not seem to allow more rate by sending faster, and may wind up easier
     # if self.frame % 2 == 0 and self.CP.carFingerprint in TSS2_CAR:
@@ -294,7 +294,9 @@ class CarController(CarControllerBase):
     # Send diagnostic message on drving bus (CAN 6) to get CC stalk button status
     # % 20 = 200ms periodic send rate
     if self.frame % 20 == 0: # 5 times per second
+      #can_sends.append(toyotacan.create_ls_accel_command(self.packer, pcm_accel_cmd, fcw_alert, acc_enable))
       can_sends.append(toyotacan.create_ls_dsu_diag_msg(self.packer, 0x02, 0x21, 1))
+      
       #can_sends.append([0x790, 6, b"\x02\x21\x01\x00\x00\x00\x00\x00", 0])
       
      # Send CAN message from DSU to clsuter (0x689) 
