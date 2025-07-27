@@ -150,7 +150,6 @@ class CarController(CarControllerBase):
     #                           steer_command)
     #   self.secoc_lka_message_counter += 1
     can_sends.append(steer_command)
-    print("can_sends: ", can_sends)
     # # STEERING_LTA does not seem to allow more rate by sending faster, and may wind up easier
     # if self.frame % 2 == 0 and self.CP.carFingerprint in TSS2_CAR:
     #   lta_active = lat_active and self.CP.steerControlType == SteerControlType.angle
@@ -305,10 +304,10 @@ class CarController(CarControllerBase):
       #can_sends.append([0x790, 6, b"\x02\x21\x01\x00\x00\x00\x00\x00", 6])
       
      # Send CAN message from DSU to clsuter (0x689) 
-    # if (self.frame % 50 == 0): #or send_ui):  # 2 times per second
-    #   can_sends.append(toyotacan.create_ls_pcm_cruise_command(self.packer, CS.radar_ready, CS.cruise_active, CS.cc_set_speed))
-    #   self.prev_set_speed = CS.cc_set_speed
-    #   print("can_sends: ", can_sends)
+    if (self.frame % 50 == 0): #or send_ui):  # 2 times per second
+      can_sends.append(toyotacan.create_ls_pcm_cruise_command(self.packer, CS.radar_ready, CS.cruise_active, CS.cc_set_speed))
+      self.prev_set_speed = CS.cc_set_speed
+      print("can_sends: ", can_sends)
 
     # keep radar disabled
     # if self.frame % 20 == 0 and self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
