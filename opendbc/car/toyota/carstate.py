@@ -261,11 +261,11 @@ class CarState(CarStateBase):
     # if CP.enableBsm:
     #   pt_messages.append(("BSM", 1))
 
-    if CP.carFingerprint in RADAR_ACC_CAR and not CP.flags & ToyotaFlags.DISABLE_RADAR.value:
-      pt_messages += [
-        ("PCS_HUD", 1),
-        ("ACC_CONTROL", 33),
-      ]
+    # if CP.carFingerprint in RADAR_ACC_CAR and not CP.flags & ToyotaFlags.DISABLE_RADAR.value:
+    #   pt_messages += [
+    #     ("PCS_HUD", 1),
+    #     ("ACC_CONTROL", 33),
+    #   ]
 
     # if CP.carFingerprint not in (TSS2_CAR - RADAR_ACC_CAR) and not CP.enableDsu and not CP.flags & ToyotaFlags.DISABLE_RADAR.value:
     #   pt_messages += [
@@ -282,8 +282,7 @@ class CarState(CarStateBase):
                       ("BODY_CONTROL_STATE_2", 2), #0x610 Gatewayed from Driving BUS
                       ("BODY_CONTROL_STATE", 3),  #0x620 Gatewayed from Driving BUS
                       ("LIGHT_STALK", 1),         #0x622 Gatewayed from Driving BUS
-                      ("PCM_CRUISE", 1),     # 0x689 Gatewayed from Body BUS; Lexus LS PCM CRUISE msg (0x689) is sent at a 1 Hz rate
-                      ("STEER_ANGLE_SENSOR_VGRS", 83),] #0x26 from RS422 signal sent from SAS to VGRS, converted RS422 to CAN msg
+                      ("PCM_CRUISE", 1), ]    # 0x689 Gatewayed from Body BUS; Lexus LS PCM CRUISE msg (0x689) is sent at a 1 Hz rate
     # if CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
     #   cam_messages += [
     #     ("LKAS_HUD", 1),
