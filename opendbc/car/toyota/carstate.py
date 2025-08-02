@@ -237,20 +237,20 @@ class CarState(CarStateBase):
       ("STEER_TORQUE_SENSOR", 50),
     ]
 
-    if CP.flags & ToyotaFlags.SECOC.value:
-      pt_messages += [
-        ("GEAR_PACKET_HYBRID", 60),
-        ("SECOC_SYNCHRONIZATION", 10),
-        ("GAS_PEDAL", 42),
-      ]
-    else:
-      #pt_messages.append(("VSC1S07", 20))
-      if CP.carFingerprint not in [CAR.TOYOTA_MIRAI]:
-        pt_messages.append(("ENGINE_RPM", 42))
+    # if CP.flags & ToyotaFlags.SECOC.value:
+    #   pt_messages += [
+    #     ("GEAR_PACKET_HYBRID", 60),
+    #     ("SECOC_SYNCHRONIZATION", 10),
+    #     ("GAS_PEDAL", 42),
+    #   ]
+    # else:
+    #   #pt_messages.append(("VSC1S07", 20))
+    #   if CP.carFingerprint not in [CAR.TOYOTA_MIRAI]:
+    #     pt_messages.append(("ENGINE_RPM", 42))
 
-      pt_messages += [
-        ("GEAR_PACKET", 1),
-      ]
+    #   pt_messages += [
+    #     ("GEAR_PACKET", 1),
+    #   ]
 
     # if CP.carFingerprint in UNSUPPORTED_DSU_CAR:
     #   pt_messages.append(("DSU_CRUISE", 5))
