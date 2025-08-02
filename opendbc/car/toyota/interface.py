@@ -132,7 +132,10 @@ class CarInterface(CarInterfaceBase):
         bool(ret.flags & ToyotaFlags.DISABLE_RADAR.value)
 
     ret.autoResumeSng = ret.openpilotLongitudinalControl and candidate in NO_STOP_TIMER_CAR
-
+    
+    #Lexus LS Lat only. Force openpilotLongitudinalControl = False
+    openpilotLongitudinalControl = False
+    
     if not ret.openpilotLongitudinalControl:
       ret.safetyConfigs[0].safetyParam |= ToyotaSafetyFlags.STOCK_LONGITUDINAL.value
 
