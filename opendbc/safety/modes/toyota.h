@@ -145,7 +145,7 @@ static void toyota_rx_hook(const CANPacket_t *to_push) {
     }
 
     // sample speed
-    if (addr == 0xaa) {
+    if (addr == 0xb0 || addr == 0xb2) {
       int speed = 0;
       // sum 4 wheel speeds. conversion: raw * 0.01 - 67.67
       for (uint8_t i = 0U; i < 8U; i += 2U) {

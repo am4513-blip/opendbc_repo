@@ -220,17 +220,17 @@ class CarState(CarStateBase):
   @staticmethod
   def get_can_parsers(CP):
     pt_messages = [
-      ("LIGHT_STALK", 1),
-      ("BLINKERS_STATE", 0.15),
-      ("BODY_CONTROL_STATE", 3),
-      ("BODY_CONTROL_STATE_2", 2),
-      ("ESP_CONTROL", 3),
-      ("EPS_STATUS", 25),
+      #("LIGHT_STALK", 1),
+      ("BLINKERS_STATE", 3),
+      #("BODY_CONTROL_STATE", 3),
+      #("BODY_CONTROL_STATE_2", 2),
+      #("ESP_CONTROL", 3),
+      #("EPS_STATUS", 25),
       ("BRAKE_MODULE", 40),
-      ("WHEEL_SPEEDS", 80),
-      ("STEER_ANGLE_SENSOR", 80),
-      ("PCM_CRUISE", 33),
-      ("PCM_CRUISE_SM", 1),
+      #("WHEEL_SPEEDS", 80),
+      ("STEER_ANGLE_SENSOR_VGRS", 80),
+      #("PCM_CRUISE", 33),
+      #("PCM_CRUISE_SM", 1),
       ("STEER_TORQUE_SENSOR", 50),
     ]
 
