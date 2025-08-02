@@ -158,13 +158,16 @@ class CarState(CarStateBase):
       # TODO: find the bit likely in DSU_CRUISE that describes an ACC fault. one may also exist in CLUTCH
       ret.cruiseState.available = cp.vl["DSU_CRUISE"]["MAIN_ON"] != 0
       ret.cruiseState.speed = cp.vl["DSU_CRUISE"]["SET_SPEED"] * CV.KPH_TO_MS
-      cluster_set_speed = cp.vl["PCM_CRUISE_ALT"]["UI_SET_SPEED"]
+      #cluster_set_speed = cp.vl["PCM_CRUISE_ALT"]["UI_SET_SPEED"]
+      
     else:
-      ret.accFaulted = cp.vl["PCM_CRUISE_2"]["ACC_FAULTED"] != 0
-      ret.carFaultedNonCritical = cp.vl["PCM_CRUISE_SM"]["TEMP_ACC_FAULTED"] != 0
-      ret.cruiseState.available = cp.vl["PCM_CRUISE_2"]["MAIN_ON"] != 0
-      ret.cruiseState.speed = cp.vl["PCM_CRUISE_2"]["SET_SPEED"] * CV.KPH_TO_MS
-      cluster_set_speed = cp.vl["PCM_CRUISE_SM"]["UI_SET_SPEED"]
+      #ret.accFaulted = cp.vl["PCM_CRUISE_2"]["ACC_FAULTED"] != 0
+      #ret.carFaultedNonCritical = cp.vl["PCM_CRUISE_SM"]["TEMP_ACC_FAULTED"] != 0
+      #ret.cruiseState.available = cp.vl["PCM_CRUISE_2"]["MAIN_ON"] != 0
+      #ret.cruiseState.speed = cp.vl["PCM_CRUISE_2"]["SET_SPEED"] * CV.KPH_TO_MS
+      #cluster_set_speed = cp.vl["PCM_CRUISE_SM"]["UI_SET_SPEED"]
+      cluster_set_speed = cp_cam.vl["PCM_CRUISE"]["UI_SET_SPEED"]
+      ret.cruiseState.available = True
 
     # UI_SET_SPEED is always non-zero when main is on, hide until first enable
     if ret.cruiseState.speed != 0:
@@ -198,22 +201,22 @@ class CarState(CarStateBase):
     ret.genericToggle = bool(cp_cam.vl["LIGHT_STALK"]["AUTO_HIGH_BEAM"])
     ret.espDisabled = cp_cam.vl["ESP_CONTROL"]["TC_DISABLED"] != 0
 
-    if self.CP.enableBsm:
-      ret.leftBlindspot = (cp.vl["BSM"]["L_ADJACENT"] == 1) or (cp.vl["BSM"]["L_APPROACHING"] == 1)
-      ret.rightBlindspot = (cp.vl["BSM"]["R_ADJACENT"] == 1) or (cp.vl["BSM"]["R_APPROACHING"] == 1)
+    # if self.CP.enableBsm:
+    #   ret.leftBlindspot = (cp.vl["BSM"]["L_ADJACENT"] == 1) or (cp.vl["BSM"]["L_APPROACHING"] == 1)
+    #   ret.rightBlindspot = (cp.vl["BSM"]["R_ADJACENT"] == 1) or (cp.vl["BSM"]["R_APPROACHING"] == 1)
 
     # if self.CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
     #   self.lkas_hud = copy.copy(cp_cam.vl["LKAS_HUD"])
 
-    if self.CP.carFingerprint not in UNSUPPORTED_DSU_CAR:
-      self.pcm_follow_distance = cp.vl["PCM_CRUISE_2"]["PCM_FOLLOW_DISTANCE"]
+    # if self.CP.carFingerprint not in UNSUPPORTED_DSU_CAR:
+    #   self.pcm_follow_distance = cp.vl["PCM_CRUISE_2"]["PCM_FOLLOW_DISTANCE"]
 
-    if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR):
-      # distance button is wired to the ACC module (camera or radar)
-      prev_distance_button = self.distance_button
-      self.distance_button = cp_acc.vl["ACC_CONTROL"]["DISTANCE"]
+    # if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR):
+    #   # distance button is wired to the ACC module (camera or radar)
+    #   prev_distance_button = self.distance_button
+    #   self.distance_button = cp_acc.vl["ACC_CONTROL"]["DISTANCE"]
 
-      ret.buttonEvents = create_button_events(self.distance_button, prev_distance_button, {1: ButtonType.gapAdjustCruise})
+    #   ret.buttonEvents = create_button_events(self.distance_button, prev_distance_button, {1: ButtonType.gapAdjustCruise})
 
     return ret
 
