@@ -264,10 +264,10 @@ class CarState(CarStateBase):
         ("ACC_CONTROL", 33),
       ]
 
-    if CP.carFingerprint not in (TSS2_CAR - RADAR_ACC_CAR) and not CP.enableDsu and not CP.flags & ToyotaFlags.DISABLE_RADAR.value:
-      pt_messages += [
-        ("PRE_COLLISION", 33),
-      ]
+    # if CP.carFingerprint not in (TSS2_CAR - RADAR_ACC_CAR) and not CP.enableDsu and not CP.flags & ToyotaFlags.DISABLE_RADAR.value:
+    #   pt_messages += [
+    #     ("PRE_COLLISION", 33),
+    #   ]
 
     cam_messages = []
     cam_messages += [ ("WHEEL_SPEED_1", 83),	#0xB0 Gatewayed from Driving BUS
