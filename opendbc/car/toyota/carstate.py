@@ -252,14 +252,14 @@ class CarState(CarStateBase):
         ("GEAR_PACKET", 1),
       ]
 
-    if CP.carFingerprint in UNSUPPORTED_DSU_CAR:
-      pt_messages.append(("DSU_CRUISE", 5))
-      pt_messages.append(("PCM_CRUISE_ALT", 1))
-    else:
-      pt_messages.append(("PCM_CRUISE_2", 33))
+    # if CP.carFingerprint in UNSUPPORTED_DSU_CAR:
+    #   pt_messages.append(("DSU_CRUISE", 5))
+    #   pt_messages.append(("PCM_CRUISE_ALT", 1))
+    # else:
+    #   pt_messages.append(("PCM_CRUISE_2", 33))
 
-    if CP.enableBsm:
-      pt_messages.append(("BSM", 1))
+    # if CP.enableBsm:
+    #   pt_messages.append(("BSM", 1))
 
     if CP.carFingerprint in RADAR_ACC_CAR and not CP.flags & ToyotaFlags.DISABLE_RADAR.value:
       pt_messages += [
