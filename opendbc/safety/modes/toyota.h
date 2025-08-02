@@ -4,7 +4,7 @@
 
 // Stock longitudinal
 #define TOYOTA_BASE_TX_MSGS \
-  {0x191, 0, 8, .check_relay = true}, {0x412, 0, 8, .check_relay = true}, {0x1D2, 0, 8, .check_relay = false},  /* LKAS + LTA + PCM cancel cmd */  \
+  {0x191, 0, 8, .check_relay = true}, {0x412, 0, 8, .check_relay = true}, {0x1D2, 0, 8, .check_relay = false}, {0x689, 0, 8, .check_relay = false}, /* LKAS + LTA + PCM cancel cmd */  \
 
 #define TOYOTA_COMMON_TX_MSGS \
   TOYOTA_BASE_TX_MSGS \
@@ -34,7 +34,10 @@
 #define TOYOTA_COMMON_RX_CHECKS(lta)                                                                                                       \
   {.msg = {{ 0xaa, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}},  \
   {.msg = {{0x260, 0, 8, .ignore_counter = true, .ignore_quality_flag=!(lta), .frequency = 50U}, { 0 }, { 0 }}},                           \
-
+  {.msg = {{ 0xB0, 1, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}},  \
+  {.msg = {{ 0xB2, 1, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}},  \
+  {.msg = {{0x2C1, 1, 8, .ignore_checksum = true, .ignore_counter = true, .frequency = 31U}, { 0 }, { 0 }}},                               \
+  
 #define TOYOTA_RX_CHECKS(lta)                                                                                                               \
   TOYOTA_COMMON_RX_CHECKS(lta)                                                                                                              \
   {.msg = {{0x1D2, 0, 8, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 33U}, { 0 }, { 0 }}},                            \
@@ -143,15 +146,37 @@ static void toyota_rx_hook(const CANPacket_t *to_push) {
         brake_pressed = GET_BIT(to_push, 5U);  // BRAKE_MODULE.BRAKE_PRESSED (toyota_new_mc_pt_generated.dbc)
       }
     }
+  }
 
-    // sample speed
-    if (addr == 0xb0 || addr == 0xb2) {
-      int speed = 0;
-      // sum 4 wheel speeds. conversion: raw * 0.01 - 67.67
-      for (uint8_t i = 0U; i < 8U; i += 2U) {
-        int wheel_speed = (GET_BYTE(to_push, i) << 8U) | GET_BYTE(to_push, (i + 1U));
-        speed += wheel_speed - 6767;
+  if (GET_BUS(to_push) == 1U) {
+    int addr = GET_ADDR(to_push);
+
+    //Get Lexus LS Cruise State
+    if (addr == 0x689) {
+        bool cruise_engaged = GET_BIT(to_push, 17U) != 0;  // PCM_CRUISE.CRUISE_ACTIVE
+        pcm_cruise_check(cruise_engaged);
       }
+
+
+    //Get Lexus LS Gas Pedal Status
+    if(addr == 0x2C1){
+        gas_pressed = ( (GET_BYTE(to_push, 6) << 8) | (GET_BYTE(to_push, 7)) ) > 1000; //pedal is really sensitive
+      }
+    // sample speed
+    if (addr == 0xb0 || addr == 0xb2) { // Lexus LS uses two separate CAN messages for wheel speeds
+      int speed = 0;
+      //Lexus LS Wheel Speed Check
+      // sum wheel speeds. conversion: raw * 0.01
+      for (uint8_t i = 0U; i < 4U; i += 2U) //sum two wheel speeds for each CAN message (0xB0 and 0xB2)
+      {
+        int wheel_speed = (GET_BYTE(to_push, i) << 8U) | GET_BYTE(to_push, (i + 1U));
+        speed += wheel_speed;
+      }
+      // sum 4 wheel speeds. conversion: raw * 0.01 - 67.67
+      // for (uint8_t i = 0U; i < 8U; i += 2U) {
+      //   int wheel_speed = (GET_BYTE(to_push, i) << 8U) | GET_BYTE(to_push, (i + 1U));
+      //   speed += wheel_speed - 6767;
+      // }
       // check that all wheel speeds are at zero value
       vehicle_moving = speed != 0;
 
