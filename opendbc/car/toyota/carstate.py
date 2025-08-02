@@ -143,12 +143,12 @@ class CarState(CarStateBase):
     ret.steeringPressed = abs(ret.steeringTorque) > STEER_THRESHOLD
 
     # Check EPS LKA/LTA fault status
-    ret.steerFaultTemporary = cp.vl["EPS_STATUS"]["LKA_STATE"] in TEMP_STEER_FAULTS
-    ret.steerFaultPermanent = cp.vl["EPS_STATUS"]["LKA_STATE"] in PERM_STEER_FAULTS
+    ret.steerFaultTemporary = cp_cam.vl["EPS_STATUS"]["LKA_STATE"] in TEMP_STEER_FAULTS
+    ret.steerFaultPermanent = cp_cam.vl["EPS_STATUS"]["LKA_STATE"] in PERM_STEER_FAULTS
 
     if self.CP.steerControlType == SteerControlType.angle:
-      ret.steerFaultTemporary = ret.steerFaultTemporary or cp.vl["EPS_STATUS"]["LTA_STATE"] in TEMP_STEER_FAULTS
-      ret.steerFaultPermanent = ret.steerFaultPermanent or cp.vl["EPS_STATUS"]["LTA_STATE"] in PERM_STEER_FAULTS
+      ret.steerFaultTemporary = ret.steerFaultTemporary or cp_cam.vl["EPS_STATUS"]["LTA_STATE"] in TEMP_STEER_FAULTS
+      ret.steerFaultPermanent = ret.steerFaultPermanent or cp_cam.vl["EPS_STATUS"]["LTA_STATE"] in PERM_STEER_FAULTS
 
       # Lane Tracing Assist control is unavailable (EPS_STATUS->LTA_STATE=0) until
       # the more accurate angle sensor signal is initialized
