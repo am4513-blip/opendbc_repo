@@ -16,7 +16,7 @@ PEDAL_TRANSITION = 10. * CV.MPH_TO_MS
 
 class CarControllerParams:
   STEER_STEP = 1
-  STEER_MAX = 1500
+  STEER_MAX = 1100
   STEER_ERROR_MAX = 350     # max delta between torque cmd and torque motor
 
   # Lane Tracing Assist (LTA) control limits
@@ -394,6 +394,12 @@ class CAR(Platforms):
     dbc_dict('toyota_new_mc_pt_generated', 'toyota_adas'),
     flags=ToyotaFlags.UNSUPPORTED_DSU,
   )
+  LEXUS_LS = PlatformConfig(
+    [ToyotaCarDocs("Lexus LS")],
+    CarSpecs(mass=4707. * CV.LB_TO_KG, wheelbase=3.09, steerRatio=15.0, tireStiffnessFactor=0.8),
+    dbc_dict('lexus_ls_new_mc_pt_generated', 'lexus_ls_adas'),
+    flags=ToyotaFlags.UNSUPPORTED_DSU,
+  )
 
 
 # (addr, cars, bus, 1/freq*100, vl)
@@ -611,7 +617,7 @@ STEER_THRESHOLD = 100
 
 # These cars have non-standard EPS torque scale factors. All others are 73
 EPS_SCALE = defaultdict(lambda: 73,
-                        {CAR.TOYOTA_PRIUS: 66, CAR.TOYOTA_COROLLA: 88, CAR.LEXUS_IS: 77, CAR.LEXUS_RC: 77, CAR.LEXUS_CTH: 100, CAR.TOYOTA_PRIUS_V: 100})
+                        {CAR.TOYOTA_PRIUS: 66, CAR.TOYOTA_COROLLA: 88, CAR.LEXUS_IS: 77, CAR.LEXUS_RC: 77, CAR.LEXUS_CTH: 100, CAR.TOYOTA_PRIUS_V: 100. CAR.LEXUS_LS: 180})
 
 # Toyota/Lexus Safety Sense 2.0 and 2.5
 TSS2_CAR = CAR.with_flags(ToyotaFlags.TSS2)

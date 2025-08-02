@@ -8,7 +8,7 @@
 
 #define TOYOTA_COMMON_TX_MSGS \
   TOYOTA_BASE_TX_MSGS \
-  {0x2E4, 0, 5, .check_relay = true}, \
+  {0x180, 0, 5, .check_relay = true}, \
   {0x343, 0, 8, .check_relay = false},  /* ACC cancel cmd */  \
 
 #define TOYOTA_COMMON_SECOC_TX_MSGS \
@@ -162,7 +162,7 @@ static void toyota_rx_hook(const CANPacket_t *to_push) {
 
 static bool toyota_tx_hook(const CANPacket_t *to_send) {
   const TorqueSteeringLimits TOYOTA_TORQUE_STEERING_LIMITS = {
-    .max_torque = 1500,
+    .max_torque = 1100,
     .max_rate_up = 15,          // ramp up slow
     .max_rate_down = 25,        // ramp down fast
     .max_torque_error = 350,    // max torque cmd in excess of motor torque
@@ -303,7 +303,7 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
     }
 
     // STEER: safety check on bytes 2-3
-    if (addr == 0x2E4) {
+    if (addr == 180) {
       int desired_torque = (GET_BYTE(to_send, 1) << 8) | GET_BYTE(to_send, 2);
       desired_torque = to_signed(desired_torque, 16);
       bool steer_req = GET_BIT(to_send, 0U);
