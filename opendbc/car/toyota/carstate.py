@@ -60,8 +60,8 @@ class CarState(CarStateBase):
     ret = structs.CarState()
     cp_acc = cp_cam if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR) else cp
 
-    if not self.CP.flags & ToyotaFlags.SECOC.value:
-      self.gvc = cp.vl["VSC1S07"]["GVC"]
+    # if not self.CP.flags & ToyotaFlags.SECOC.value:
+    #   self.gvc = cp.vl["VSC1S07"]["GVC"]
 
     ret.doorOpen = any([cp_cam.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FL"], cp_cam.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FR"],
                         cp_cam.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_RL"], cp_cam.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_RR"]])
