@@ -137,8 +137,8 @@ class CarState(CarStateBase):
     ret.leftBlinker = cp.vl["BLINKERS_STATE"]["TURN_SIGNALS"] == 5
     ret.rightBlinker = cp.vl["BLINKERS_STATE"]["TURN_SIGNALS"] == 10
 
-    ret.steeringTorque = cp.vl["STEER_TORQUE_SENSOR"]["STEER_TORQUE_DRIVER"]
-    ret.steeringTorqueEps = cp.vl["STEER_TORQUE_SENSOR"]["STEER_TORQUE_EPS"] * self.eps_torque_scale
+    ret.steeringTorque = 0 #cp.vl["STEER_TORQUE_SENSOR"]["STEER_TORQUE_DRIVER"]
+    ret.steeringTorqueEps = cp.vl["STEER_TORQUE_SENSOR"]["STEER_TORQUE_EPS"] * 1.8 #self.eps_torque_scale
     # we could use the override bit from dbc, but it's triggered at too high torque values
     ret.steeringPressed = abs(ret.steeringTorque) > STEER_THRESHOLD
 
