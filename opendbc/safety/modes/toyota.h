@@ -95,7 +95,7 @@ static void toyota_rx_hook(const CANPacket_t *to_push) {
       torque_meas_new = to_signed(torque_meas_new, 16);
 
       // scale by dbc_factor
-      torque_meas_new = (torque_meas_new * toyota_dbc_eps_torque_factor) / 100;
+      torque_meas_new = (torque_meas_new * 1.8f);  // 100;
 
       // update array of sample
       update_sample(&torque_meas, torque_meas_new);
