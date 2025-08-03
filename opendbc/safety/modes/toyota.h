@@ -37,7 +37,7 @@
   {.msg = {{ 0xB0, 1, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}},  \
   {.msg = {{ 0xB2, 1, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}},  \
   {.msg = {{0x2C1, 1, 8, .ignore_checksum = true, .ignore_counter = true, .frequency = 31U}, { 0 }, { 0 }}},                               \
-  
+
 #define TOYOTA_RX_CHECKS(lta)                                                                                                               \
   TOYOTA_COMMON_RX_CHECKS(lta)                                                                                                              \
   {.msg = {{0x1D2, 0, 8, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 33U}, { 0 }, { 0 }}},                            \
@@ -139,12 +139,15 @@ static void toyota_rx_hook(const CANPacket_t *to_push) {
         pcm_cruise_check(cruise_engaged);
         gas_pressed = !GET_BIT(to_push, 4U);  // PCM_CRUISE.GAS_RELEASED
       }
-      if (!toyota_alt_brake && (addr == 0x226)) {
-        brake_pressed = GET_BIT(to_push, 37U);  // BRAKE_MODULE.BRAKE_PRESSED (toyota_nodsu_pt_generated.dbc)
+      if (addr == 0x224) { //Lexus LS Brake Pressed Msg
+         brake_pressed = GET_BIT(to_push, 5U);  // BRAKE_MODULE.BRAKE_PRESSED
       }
-      if (toyota_alt_brake && (addr == 0x224)) {
-        brake_pressed = GET_BIT(to_push, 5U);  // BRAKE_MODULE.BRAKE_PRESSED (toyota_new_mc_pt_generated.dbc)
-      }
+      // if (!toyota_alt_brake && (addr == 0x226)) {
+      //   brake_pressed = GET_BIT(to_push, 37U);  // BRAKE_MODULE.BRAKE_PRESSED (toyota_nodsu_pt_generated.dbc)
+      // }
+      // if (toyota_alt_brake && (addr == 0x224)) {
+      //   brake_pressed = GET_BIT(to_push, 5U);  // BRAKE_MODULE.BRAKE_PRESSED (toyota_new_mc_pt_generated.dbc)
+      // }
     }
   }
 
