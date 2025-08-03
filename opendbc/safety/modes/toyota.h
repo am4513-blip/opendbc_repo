@@ -149,6 +149,8 @@ static void toyota_rx_hook(const CANPacket_t *to_push) {
       //   brake_pressed = GET_BIT(to_push, 5U);  // BRAKE_MODULE.BRAKE_PRESSED (toyota_new_mc_pt_generated.dbc)
       // }
     }
+    bool cruise_engaged = 0;
+    pcm_cruise_check(cruise_engaged);
   }
 
   if (GET_BUS(to_push) == 1U) {
