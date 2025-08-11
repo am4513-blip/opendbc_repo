@@ -7,7 +7,7 @@
 
 // Stock longitudinal
 #define TOYOTA_BASE_TX_MSGS \
-  {0x191, 0, 8, .check_relay = true}, {0x412, 0, 8, .check_relay = true}, {0x1D2, 0, 8, .check_relay = false}, {0x689, 0, 8, .check_relay = false}, /* LKAS + LTA + PCM cancel cmd */  \
+  {0x191, 0, 8, .check_relay = true}, {0x412, 0, 8, .check_relay = true}, {0x1D2, 0, 8, .check_relay = false}, /* LKAS + LTA + PCM cancel cmd */  \
 
 #define TOYOTA_COMMON_TX_MSGS \
   TOYOTA_BASE_TX_MSGS \
@@ -48,7 +48,7 @@
 
 #define TOYOTA_ALT_BRAKE_RX_CHECKS(lta)                                                                                                    \
   TOYOTA_COMMON_RX_CHECKS(lta)                                                                                                             \
-  {.msg = {{0x1D2, 0, 8, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 33U}, { 0 }, { 0 }}},                           \
+  {.msg = {{0x689, 0, 8, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 1U}, { 0 }, { 0 }}},                            \
   {.msg = {{0x224, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 40U}, { 0 }, { 0 }}},  \
 
 #define TOYOTA_SECOC_RX_CHECKS                                                                                                             \
@@ -167,7 +167,7 @@ static void toyota_rx_hook(const CANPacket_t *to_push) {
         gas_pressed = ( (GET_BYTE(to_push, 6) << 8) | (GET_BYTE(to_push, 7)) ) > 1000; //pedal is really sensitive
       }
     // sample speed
-    if (addr == 0xb0 || addr == 0xb2) { // Lexus LS uses two separate CAN messages for wheel speeds
+    if (addr == 0xB0 || addr == 0xB2) { // Lexus LS uses two separate CAN messages for wheel speeds
       int speed = 0;
       //Lexus LS Wheel Speed Check
       // sum wheel speeds. conversion: raw * 0.01
@@ -184,7 +184,7 @@ static void toyota_rx_hook(const CANPacket_t *to_push) {
       // check that all wheel speeds are at zero value
       vehicle_moving = speed != 0;
 
-      UPDATE_VEHICLE_SPEED(speed / 4.0 * 0.01 * KPH_TO_MS);
+      UPDATE_VEHICLE_SPEED(speed / 2.0 * 0.01 * KPH_TO_MS);
     }
   }
 }
