@@ -4,6 +4,7 @@
 
 #define ALLOW_DEBUG 1
 
+
 // Stock longitudinal
 #define TOYOTA_BASE_TX_MSGS \
   {0x191, 0, 8, .check_relay = true}, {0x412, 0, 8, .check_relay = true}, {0x1D2, 0, 8, .check_relay = false}, {0x689, 0, 8, .check_relay = false}, /* LKAS + LTA + PCM cancel cmd */  \
@@ -88,6 +89,7 @@ static bool toyota_get_quality_flag_valid(const CANPacket_t *to_push) {
 }
 
 static void toyota_rx_hook(const CANPacket_t *to_push) {
+  printf("Hi from toyota rx hook");
   if (GET_BUS(to_push) == 0U) {
     int addr = GET_ADDR(to_push);
 
