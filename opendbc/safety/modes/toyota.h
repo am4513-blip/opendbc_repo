@@ -84,7 +84,6 @@ static bool toyota_get_quality_flag_valid(const CANPacket_t *to_push) {
   if (addr == 0x260) {
     valid = !GET_BIT(to_push, 3U);  // STEER_ANGLE_INITIALIZING
   }
-  valid = true;
   return valid;
 }
 
