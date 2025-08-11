@@ -1,7 +1,6 @@
 #pragma once
 
 #include "opendbc/safety/safety_declarations.h"
-#include <stdio.h>
 
 #define ALLOW_DEBUG 1
 
