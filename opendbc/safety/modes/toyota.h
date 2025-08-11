@@ -35,15 +35,14 @@
   {0x343, 0, 8, .check_relay = true},  \
 
 #define TOYOTA_COMMON_RX_CHECKS(lta)                                                                                                       \
-  {.msg = {{ 0xaa, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}},  \
-  {.msg = {{0x260, 0, 8, .ignore_counter = true, .ignore_quality_flag=!(lta), .frequency = 50U}, { 0 }, { 0 }}},                           \
+  {.msg = {{0x260, 0, 8, .ignore_counter = true, .ignore_quality_flag=true, /*!(lta),*/ .frequency = 50U}, { 0 }, { 0 }}},                           \
   {.msg = {{ 0xB0, 1, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}},  \
   {.msg = {{ 0xB2, 1, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}},  \
   {.msg = {{0x2C1, 1, 8, .ignore_checksum = true, .ignore_counter = true, .frequency = 31U}, { 0 }, { 0 }}},                               \
 
 #define TOYOTA_RX_CHECKS(lta)                                                                                                               \
   TOYOTA_COMMON_RX_CHECKS(lta)                                                                                                              \
-  {.msg = {{0x1D2, 0, 8, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 33U}, { 0 }, { 0 }}},                            \
+  {.msg = {{0x689, 1, 8, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 1U}, { 0 }, { 0 }}},                            \
   {.msg = {{0x226, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 40U},  { 0 }, { 0 }}},  \
 
 #define TOYOTA_ALT_BRAKE_RX_CHECKS(lta)                                                                                                    \
@@ -393,6 +392,8 @@ static safety_config toyota_init(uint16_t param) {
   toyota_dbc_eps_torque_factor = param & TOYOTA_EPS_FACTOR;
 
   safety_config ret;
+
+
   if (toyota_stock_longitudinal) {
     if (toyota_secoc) {
       SET_TX_MSGS(TOYOTA_SECOC_TX_MSGS, ret);
