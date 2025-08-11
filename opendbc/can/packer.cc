@@ -45,6 +45,9 @@ std::vector<uint8_t> CANPacker::pack(uint32_t address, const std::vector<SignalP
   auto msg_it = dbc->addr_to_msg.find(address);
   if (msg_it == dbc->addr_to_msg.end()) {
     LOGE("undefined address %d", address);
+	for (const auto &sig : signals) {
+		LOGE("Signal name: %s, value: %f", sig.name.c_str(), sig.value);
+	}
     return {};
   }
 
