@@ -59,7 +59,7 @@
 
 static bool toyota_secoc = false;
 static bool toyota_alt_brake = false;
-static bool toyota_stock_longitudinal = false;
+static bool toyota_stock_longitudinal = true;
 static bool toyota_lta = false;
 static int toyota_dbc_eps_torque_factor = 100;   // conversion factor for STEER_TORQUE_EPS in %: see dbc file
 
@@ -382,18 +382,18 @@ static safety_config toyota_init(uint16_t param) {
   // first byte is for EPS factor, second is for flags
   const uint32_t TOYOTA_PARAM_OFFSET = 8U;
   const uint32_t TOYOTA_EPS_FACTOR = (1UL << TOYOTA_PARAM_OFFSET) - 1U;
-  const uint32_t TOYOTA_PARAM_ALT_BRAKE = 1UL << TOYOTA_PARAM_OFFSET;
+  //const uint32_t TOYOTA_PARAM_ALT_BRAKE = 1UL << TOYOTA_PARAM_OFFSET;
   //const uint32_t TOYOTA_PARAM_STOCK_LONGITUDINAL = 2UL << TOYOTA_PARAM_OFFSET;
-  const uint32_t TOYOTA_PARAM_LTA = 4UL << TOYOTA_PARAM_OFFSET;
+  //const uint32_t TOYOTA_PARAM_LTA = 4UL << TOYOTA_PARAM_OFFSET;
 
 // #ifdef ALLOW_DEBUG
 //   const uint32_t TOYOTA_PARAM_SECOC = 8UL << TOYOTA_PARAM_OFFSET;
 //   toyota_secoc = GET_FLAG(param, TOYOTA_PARAM_SECOC);
 // #endif
 
-  toyota_alt_brake = GET_FLAG(param, TOYOTA_PARAM_ALT_BRAKE);
+  toyota_alt_brake = 1; //GET_FLAG(param, TOYOTA_PARAM_ALT_BRAKE);
   toyota_stock_longitudinal = 1; //= GET_FLAG(param, TOYOTA_PARAM_STOCK_LONGITUDINAL);
-  toyota_lta = GET_FLAG(param, TOYOTA_PARAM_LTA);
+  toyota_lta = 0;//GET_FLAG(param, TOYOTA_PARAM_LTA);
   toyota_dbc_eps_torque_factor = param & TOYOTA_EPS_FACTOR;
 
   safety_config ret;
