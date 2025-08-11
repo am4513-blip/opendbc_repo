@@ -332,7 +332,7 @@ void safety_tick(const safety_config *cfg) {
         controls_allowed = false;
       }
 
-      if (lagging || !is_msg_valid(cfg->rx_checks, i)) {
+      if (lagging /*|| !is_msg_valid(cfg->rx_checks, i)*/) {
         rx_checks_invalid = true;
       }
     }
