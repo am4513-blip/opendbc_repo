@@ -137,11 +137,11 @@ static void toyota_rx_hook(const CANPacket_t *to_push) {
         brake_pressed = GET_BIT(to_push, 3U);  // BRAKE_MODULE.BRAKE_PRESSED (toyota_rav4_prime_generated.dbc)
       }
     } else {
-      if (addr == 0x1D2) {
-        bool cruise_engaged = GET_BIT(to_push, 5U);  // PCM_CRUISE.CRUISE_ACTIVE
-        pcm_cruise_check(cruise_engaged);
-        gas_pressed = !GET_BIT(to_push, 4U);  // PCM_CRUISE.GAS_RELEASED
-      }
+      // if (addr == 0x1D2) {
+      //   bool cruise_engaged = GET_BIT(to_push, 5U);  // PCM_CRUISE.CRUISE_ACTIVE
+      //   pcm_cruise_check(cruise_engaged);
+      //   gas_pressed = !GET_BIT(to_push, 4U);  // PCM_CRUISE.GAS_RELEASED
+      // }
       if (addr == 0x224) { //Lexus LS Brake Pressed Msg
          brake_pressed = GET_BIT(to_push, 5U);  // BRAKE_MODULE.BRAKE_PRESSED
       }
@@ -152,8 +152,6 @@ static void toyota_rx_hook(const CANPacket_t *to_push) {
       //   brake_pressed = GET_BIT(to_push, 5U);  // BRAKE_MODULE.BRAKE_PRESSED (toyota_new_mc_pt_generated.dbc)
       // }
     }
-    bool cruise_engaged = 0;
-    pcm_cruise_check(cruise_engaged);
   }
 
   if (GET_BUS(to_push) == 1U) {
@@ -164,8 +162,6 @@ static void toyota_rx_hook(const CANPacket_t *to_push) {
         bool cruise_engaged = GET_BIT(to_push, 17U) != 0;  // PCM_CRUISE.CRUISE_ACTIVE
         pcm_cruise_check(cruise_engaged);
       }
-
-
     //Get Lexus LS Gas Pedal Status
     if(addr == 0x2C1){
         gas_pressed = ( (GET_BYTE(to_push, 6) << 8) | (GET_BYTE(to_push, 7)) ) > 1000; //pedal is really sensitive
