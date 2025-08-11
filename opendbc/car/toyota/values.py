@@ -395,7 +395,7 @@ class CAR(Platforms):
     flags=ToyotaFlags.UNSUPPORTED_DSU,
   )
   LEXUS_LS = PlatformConfig(
-    [ToyotaCarDocs("Lexus LS")],
+    [ToyotaCarDocs("Lexus LS",min_enable_speed=0)],
     CarSpecs(mass=4707. * CV.LB_TO_KG, wheelbase=3.09, steerRatio=15.0, tireStiffnessFactor=0.8),
     dbc_dict('lexus_ls_new_mc_pt_generated', 'lexus_ls_adas'),
     flags=ToyotaFlags.DISABLE_RADAR,
