@@ -35,7 +35,7 @@
   {0x343, 0, 8, .check_relay = true},  \
 
 #define TOYOTA_COMMON_RX_CHECKS(lta)                                                                                                       \
-  {.msg = {{0x260, 0, 8, .ignore_counter = true, .ignore_quality_flag=false, /*!(lta),*/ .frequency = 50U}, { 0 }, { 0 }}},                 \
+  {.msg = {{0x260, 0, 8, .ignore_counter = true, .ignore_quality_flag=!(lta), .frequency = 50U}, { 0 }, { 0 }}},                 \
   {.msg = {{ 0xB0, 1, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}},  \
   {.msg = {{ 0xB2, 1, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}},  \
   {.msg = {{0x2C1, 1, 8, .ignore_checksum = true, .ignore_counter = true, .frequency = 31U}, { 0 }, { 0 }}},                               \
@@ -83,7 +83,9 @@ static bool toyota_get_quality_flag_valid(const CANPacket_t *to_push) {
   bool valid = false;
   if (addr == 0x260) {
     valid = !GET_BIT(to_push, 3U);  // STEER_ANGLE_INITIALIZING
+    valid = true;
   }
+
   return valid;
 }
 
