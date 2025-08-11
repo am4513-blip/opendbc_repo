@@ -340,9 +340,6 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
       int desired_torque = (GET_BYTE(to_send, 1) << 8) | GET_BYTE(to_send, 2);
       desired_torque = to_signed(desired_torque, 16);
       bool steer_req = GET_BIT(to_send, 0U);
-      #ifdef ALLOW_DEBUG
-        printf("desired_torque=%d steer_req=%d\n", desired_torque, steer_req);
-      #endif
       // When using LTA (angle control), assert no actuation on LKA message
       if (!toyota_lta) {
         if (steer_torque_cmd_checks(desired_torque, steer_req, TOYOTA_TORQUE_STEERING_LIMITS)) {
