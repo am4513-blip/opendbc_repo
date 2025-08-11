@@ -2,6 +2,8 @@
 
 #include "opendbc/safety/safety_declarations.h"
 
+#define ALLOW_DEBUG 1
+
 // Stock longitudinal
 #define TOYOTA_BASE_TX_MSGS \
   {0x191, 0, 8, .check_relay = true}, {0x412, 0, 8, .check_relay = true}, {0x1D2, 0, 8, .check_relay = false}, {0x689, 0, 8, .check_relay = false}, /* LKAS + LTA + PCM cancel cmd */  \
@@ -332,11 +334,14 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
       }
     }
 
-    // STEER: safety check on bytes 2-3
+    // STEER: safety check on bytes 1-2
     if (addr == 0x180) {
       int desired_torque = (GET_BYTE(to_send, 1) << 8) | GET_BYTE(to_send, 2);
       desired_torque = to_signed(desired_torque, 16);
       bool steer_req = GET_BIT(to_send, 0U);
+      #ifdef ALLOW_DEBUG
+        printf("desired_torque=%d steer_req=%d\n", desired_torque, steer_req);
+      #endif
       // When using LTA (angle control), assert no actuation on LKA message
       if (!toyota_lta) {
         if (steer_torque_cmd_checks(desired_torque, steer_req, TOYOTA_TORQUE_STEERING_LIMITS)) {
@@ -383,10 +388,10 @@ static safety_config toyota_init(uint16_t param) {
   const uint32_t TOYOTA_PARAM_STOCK_LONGITUDINAL = 2UL << TOYOTA_PARAM_OFFSET;
   const uint32_t TOYOTA_PARAM_LTA = 4UL << TOYOTA_PARAM_OFFSET;
 
-#ifdef ALLOW_DEBUG
-  const uint32_t TOYOTA_PARAM_SECOC = 8UL << TOYOTA_PARAM_OFFSET;
-  toyota_secoc = GET_FLAG(param, TOYOTA_PARAM_SECOC);
-#endif
+// #ifdef ALLOW_DEBUG
+//   const uint32_t TOYOTA_PARAM_SECOC = 8UL << TOYOTA_PARAM_OFFSET;
+//   toyota_secoc = GET_FLAG(param, TOYOTA_PARAM_SECOC);
+// #endif
 
   toyota_alt_brake = GET_FLAG(param, TOYOTA_PARAM_ALT_BRAKE);
   toyota_stock_longitudinal = GET_FLAG(param, TOYOTA_PARAM_STOCK_LONGITUDINAL);
