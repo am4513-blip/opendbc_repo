@@ -96,7 +96,7 @@ static void stock_ecu_check(bool stock_ecu_detected);
 static bool is_msg_valid(RxCheck addr_list[], int index) {
   bool valid = true;
   if (index != -1) {
-    if (!addr_list[index].status.valid_checksum || !addr_list[index].status.valid_quality_flag || (addr_list[index].status.wrong_counters >= MAX_WRONG_COUNTERS)) {
+    if (/*!addr_list[index].status.valid_checksum || */!addr_list[index].status.valid_quality_flag || (addr_list[index].status.wrong_counters >= MAX_WRONG_COUNTERS)) {
       valid = false;
       controls_allowed = false;
     }
@@ -332,7 +332,7 @@ void safety_tick(const safety_config *cfg) {
         controls_allowed = false;
       }
 
-      if (/*lagging ||*/ !is_msg_valid(cfg->rx_checks, i) ) {
+      if (lagging || !is_msg_valid(cfg->rx_checks, i) ) {
         rx_checks_invalid = true;
       }
     }
