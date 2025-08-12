@@ -16,7 +16,7 @@ PEDAL_TRANSITION = 10. * CV.MPH_TO_MS
 
 class CarControllerParams:
   STEER_STEP = 1
-  STEER_MAX = 1100
+  STEER_MAX = 1050
   STEER_ERROR_MAX = 350     # max delta between torque cmd and torque motor
 
   # Lane Tracing Assist (LTA) control limits
@@ -43,10 +43,10 @@ class CarControllerParams:
 
     if CP.lateralTuning.which() == 'torque':
       self.STEER_DELTA_UP = 10       # 1.0s time to peak torque
-      self.STEER_DELTA_DOWN = 40     # always lower than 45 otherwise the Rav4 faults (Prius seems ok with 50)
+      self.STEER_DELTA_DOWN = 10     # always lower than 45 otherwise the Rav4 faults (Prius seems ok with 50)
     else:
       self.STEER_DELTA_UP = 10       # 1.5s time to peak torque
-      self.STEER_DELTA_DOWN = 40    # always lower than 45 otherwise the Rav4 faults (Prius seems ok with 50)
+      self.STEER_DELTA_DOWN = 10    # always lower than 45 otherwise the Rav4 faults (Prius seems ok with 50)
 
 
 class ToyotaSafetyFlags(IntFlag):
