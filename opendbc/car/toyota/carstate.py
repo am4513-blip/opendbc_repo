@@ -69,7 +69,7 @@ class CarState(CarStateBase):
     ret.parkingBrake = cp_cam.vl["BODY_CONTROL_STATE"]["PARKING_BRAKE"] == 1
 
     ret.brakePressed = cp.vl["BRAKE_MODULE"]["BRAKE_PRESSED"] != 0
-    ret.brakeHoldActive = 0 #cp_cam.vl["ESP_CONTROL"]["BRAKE_HOLD_ACTIVE"] == 1
+    ret.brakeHoldActive = False #cp_cam.vl["ESP_CONTROL"]["BRAKE_HOLD_ACTIVE"] == 1
 
     if self.CP.flags & ToyotaFlags.SECOC.value:
       self.secoc_synchronization = copy.copy(cp.vl["SECOC_SYNCHRONIZATION"])
@@ -199,7 +199,7 @@ class CarState(CarStateBase):
     #ret.cruiseState.nonAdaptive = self.pcm_acc_status in (1, 2, 3, 4, 5, 6)
 
     ret.genericToggle = bool(cp_cam.vl["LIGHT_STALK"]["AUTO_HIGH_BEAM"])
-    ret.espDisabled = 0 #cp_cam.vl["ESP_CONTROL"]["TC_DISABLED"] != 0
+    ret.espDisabled = False #cp_cam.vl["ESP_CONTROL"]["TC_DISABLED"] != 0
 
     # if self.CP.enableBsm:
     #   ret.leftBlindspot = (cp.vl["BSM"]["L_ADJACENT"] == 1) or (cp.vl["BSM"]["L_APPROACHING"] == 1)
