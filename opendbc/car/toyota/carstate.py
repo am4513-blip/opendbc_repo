@@ -282,7 +282,7 @@ class CarState(CarStateBase):
                       ("BODY_CONTROL_STATE_2", 2), #0x610 Gatewayed from Driving BUS
                       ("BODY_CONTROL_STATE", 3),  #0x620 Gatewayed from Driving BUS
                       ("LIGHT_STALK", 1),         #0x622 Gatewayed from Driving BUS
-                      ("PCM_CRUISE", 1), ]    # 0x689 Gatewayed from Body BUS; Lexus LS PCM CRUISE msg (0x689) is sent at a 1 Hz rate
+                      ("ACC_COMMAND", 31), ]    # 0x280 Gatewayed from Body BUS; Lexus LS ACC_ENABLE signal
     # if CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
     #   cam_messages += [
     #     ("LKAS_HUD", 1),
