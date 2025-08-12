@@ -278,8 +278,8 @@ class CarController(CarControllerBase):
           can_sends.append(CanData(addr, vl, bus))
 
     # keep radar disabled
-    if self.frame % 20 == 0 and self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
-      can_sends.append(make_tester_present_msg(0x750, 0, 0xF))
+    # if self.frame % 20 == 0 and self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
+    #   can_sends.append(make_tester_present_msg(0x750, 0, 0xF))
 
     new_actuators = actuators.as_builder()
     new_actuators.torque = apply_torque / self.params.STEER_MAX
