@@ -166,7 +166,7 @@ class CarState(CarStateBase):
       #ret.cruiseState.available = cp.vl["PCM_CRUISE_2"]["MAIN_ON"] != 0
       #ret.cruiseState.speed = cp.vl["PCM_CRUISE_2"]["SET_SPEED"] * CV.KPH_TO_MS
       #cluster_set_speed = cp.vl["PCM_CRUISE_SM"]["UI_SET_SPEED"]
-      cluster_set_speed = cp_cam.vl["PCM_CRUISE"]["UI_SET_SPEED"]
+      cluster_set_speed = 88 #cp_cam.vl["PCM_CRUISE"]["UI_SET_SPEED"]
       ret.cruiseState.available = True
 
     # UI_SET_SPEED is always non-zero when main is on, hide until first enable
