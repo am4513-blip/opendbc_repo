@@ -69,7 +69,7 @@ class CarState(CarStateBase):
     ret.parkingBrake = cp_cam.vl["BODY_CONTROL_STATE"]["PARKING_BRAKE"] == 1
 
     ret.brakePressed = cp.vl["BRAKE_MODULE"]["BRAKE_PRESSED"] != 0
-    ret.brakeHoldActive = cp_cam.vl["ESP_CONTROL"]["BRAKE_HOLD_ACTIVE"] == 1
+    ret.brakeHoldActive = 0 #cp_cam.vl["ESP_CONTROL"]["BRAKE_HOLD_ACTIVE"] == 1
 
     if self.CP.flags & ToyotaFlags.SECOC.value:
       self.secoc_synchronization = copy.copy(cp.vl["SECOC_SYNCHRONIZATION"])
@@ -199,7 +199,7 @@ class CarState(CarStateBase):
     #ret.cruiseState.nonAdaptive = self.pcm_acc_status in (1, 2, 3, 4, 5, 6)
 
     ret.genericToggle = bool(cp_cam.vl["LIGHT_STALK"]["AUTO_HIGH_BEAM"])
-    ret.espDisabled = cp_cam.vl["ESP_CONTROL"]["TC_DISABLED"] != 0
+    ret.espDisabled = 0 #cp_cam.vl["ESP_CONTROL"]["TC_DISABLED"] != 0
 
     # if self.CP.enableBsm:
     #   ret.leftBlindspot = (cp.vl["BSM"]["L_ADJACENT"] == 1) or (cp.vl["BSM"]["L_APPROACHING"] == 1)
@@ -277,7 +277,7 @@ class CarState(CarStateBase):
                       ("WHEEL_SPEED_2", 83),	#0xB2 Gatewayed from Driving BUS
                       ("EPS_STATUS", 25),		  #0x262 Gatewayed from Driving BUS
                       ("GEAR_PACKET", 1),		  #0x3B4 Gatewayed from Driving BUS
-                      ("ESP_CONTROL", 3),     #0x3B7 Gatewayed from Body BUS
+                     #("ESP_CONTROL", 3),     #0x3B7 Gatewayed from Body BUS
                       ("GAS_PEDAL", 31),       #0x2C1 Gatewayed from Driving BUS
                       ("BODY_CONTROL_STATE_2", 2), #0x610 Gatewayed from Driving BUS
                       ("BODY_CONTROL_STATE", 3),  #0x620 Gatewayed from Driving BUS
