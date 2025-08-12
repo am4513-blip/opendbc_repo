@@ -195,7 +195,7 @@ class CarState(CarStateBase):
       #Lexus_LS does not have a cruise CAN signal that indicates standstill, so use wheel speeds
       ret.cruiseState.standstill = ret.vEgoRaw == 0
       
-    ret.cruiseState.enabled = bool(cp_cam.vl["PCM_CRUISE"]["CRUISE_ACTIVE"])
+    ret.cruiseState.enabled = cp_cam.vl["ACC_COMMAND"]["ACCEL_ENABLE"] != 0
     #ret.cruiseState.nonAdaptive = self.pcm_acc_status in (1, 2, 3, 4, 5, 6)
 
     ret.genericToggle = bool(cp_cam.vl["LIGHT_STALK"]["AUTO_HIGH_BEAM"])
