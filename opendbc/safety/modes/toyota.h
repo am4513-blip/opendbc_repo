@@ -42,12 +42,12 @@
 
 #define TOYOTA_RX_CHECKS(lta)                                                                                                               \
   TOYOTA_COMMON_RX_CHECKS(lta)                                                                                                              \
-  {.msg = {{0x280, 1, 8, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 31U}, { 0 }, { 0 }}},                            \
+  {.msg = {{0x280, 1, 8, .ignore_counter = true, .ignore_checksum = true, .ignore_quality_flag = true, .frequency = 31U}, { 0 }, { 0 }}},                            \
   {.msg = {{0x226, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 40U},  { 0 }, { 0 }}},  \
 
 #define TOYOTA_ALT_BRAKE_RX_CHECKS(lta)                                                                                                    \
   TOYOTA_COMMON_RX_CHECKS(lta)                                                                                                             \
-  {.msg = {{0x280, 1, 8, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 31U}, { 0 }, { 0 }}},                            \
+  {.msg = {{0x280, 1, 8, .ignore_counter = true, .ignore_checksum = true, .ignore_quality_flag = true, .frequency = 31U}, { 0 }, { 0 }}},                            \
   {.msg = {{0x224, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 40U}, { 0 }, { 0 }}},  \
 
 #define TOYOTA_SECOC_RX_CHECKS                                                                                                             \
@@ -158,7 +158,7 @@ static void toyota_rx_hook(const CANPacket_t *to_push) {
 
     //Get Lexus LS Cruise State
     if (addr == 0x280) {
-        bool cruise_engaged = GET_BIT(to_push, 2U) != 0;  // PCM_CRUISE.CRUISE_ACTIVE
+        bool cruise_engaged = GET_BIT(to_push, 34U) != 0;  // PCM_CRUISE.CRUISE_ACTIVE
         pcm_cruise_check(cruise_engaged);
       }
     //Get Lexus LS Gas Pedal Status
