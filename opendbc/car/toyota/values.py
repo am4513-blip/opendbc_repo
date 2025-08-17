@@ -55,7 +55,9 @@ class ToyotaSafetyFlags(IntFlag):
   STOCK_LONGITUDINAL = (2 << 8)
   LTA = (4 << 8)
   SECOC = (8 << 8)
-
+  
+  LEXUS_LS_STEERING_BUS = (16 << 8) #First Panda (internal inside C3X)
+  LEXUS_LS_DRIVING_BUS =  (32 << 8) #Second Panda (external)
 
 class ToyotaFlags(IntFlag):
   # Detected flags
@@ -394,6 +396,12 @@ class CAR(Platforms):
     dbc_dict('toyota_new_mc_pt_generated', 'toyota_adas'),
     flags=ToyotaFlags.UNSUPPORTED_DSU,
   )
+  LEXUS_LS = PlatformConfig(
+    [ToyotaCarDocs("Lexus LS")],
+    CarSpecs(mass=4332. * CV.LB_TO_KG, wheelbase=3.091, steerRatio=15.0, tireStiffnessFactor=0.55),
+    dbc_dict('lexus_ls_new_mc_pt_generated', 'lexus_ls_adas'),
+    flags=ToyotaFlags.UNSUPPORTED_DSU | ToyotaFlags.NO_STOP_TIMER | ToyotaFlags.SNG_WITHOUT_DSU,
+  )
 
 
 # (addr, cars, bus, 1/freq*100, vl)
@@ -611,7 +619,7 @@ STEER_THRESHOLD = 100
 
 # These cars have non-standard EPS torque scale factors. All others are 73
 EPS_SCALE = defaultdict(lambda: 73,
-                        {CAR.TOYOTA_PRIUS: 66, CAR.TOYOTA_COROLLA: 88, CAR.LEXUS_IS: 77, CAR.LEXUS_RC: 77, CAR.LEXUS_CTH: 100, CAR.TOYOTA_PRIUS_V: 100})
+                        {CAR.TOYOTA_PRIUS: 66, CAR.TOYOTA_COROLLA: 88, CAR.LEXUS_IS: 77, CAR.LEXUS_RC: 77, CAR.LEXUS_CTH: 100, CAR.TOYOTA_PRIUS_V: 100, CAR.LEXUS_LS: 180})
 
 # Toyota/Lexus Safety Sense 2.0 and 2.5
 TSS2_CAR = CAR.with_flags(ToyotaFlags.TSS2)
