@@ -8,12 +8,12 @@
 
 #define TOYOTA_COMMON_TX_MSGS \
   TOYOTA_BASE_TX_MSGS \
-  {0x2E4, 0, 5, .check_relay = true}, \
+  {0x180, 0, 5, .check_relay = true}, \
   {0x343, 0, 8, .check_relay = false},  /* ACC cancel cmd */  \
 
 #define TOYOTA_COMMON_SECOC_TX_MSGS \
   TOYOTA_BASE_TX_MSGS \
-  {0x2E4, 0, 8, .check_relay = true}, {0x131, 0, 8, .check_relay = true}, \
+  {0x180, 0, 8, .check_relay = true}, {0x131, 0, 8, .check_relay = true}, \
   {0x343, 0, 8, .check_relay = false},  /* ACC cancel cmd */  \
 
 #define TOYOTA_COMMON_LONG_TX_MSGS \
@@ -303,7 +303,7 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
     }
 
     // STEER: safety check on bytes 2-3
-    if (addr == 0x2E4) {
+    if (addr == 0x180) {
       int desired_torque = (GET_BYTE(to_send, 1) << 8) | GET_BYTE(to_send, 2);
       desired_torque = to_signed(desired_torque, 16);
       bool steer_req = GET_BIT(to_send, 0U);
