@@ -257,35 +257,36 @@ class CarController(CarControllerBase):
       pcm_accel_cmd = float(np.clip(pcm_accel_cmd, self.params.ACCEL_MIN, self.params.ACCEL_MAX))
       can_sends.append(toyotacan.create_ls_accel_command(self.packer, pcm_accel_cmd, fcw_alert, acc_enable))
       self.accel = pcm_accel_cmd
-    else:
-      # we can spam can to cancel the system even if we are using lat only control
-      if pcm_cancel_cmd:
-        if self.CP.carFingerprint in UNSUPPORTED_DSU_CAR:
-          can_sends.append(toyotacan.create_acc_cancel_command(self.packer))
-        else:
-          can_sends.append(toyotacan.create_accel_command(self.packer, 0, pcm_cancel_cmd, True, False, lead, CS.acc_type, False, self.distance_button))
+      
+    # else:
+    #   # we can spam can to cancel the system even if we are using lat only control
+    #   if pcm_cancel_cmd:
+    #     if self.CP.carFingerprint in UNSUPPORTED_DSU_CAR:
+    #       can_sends.append(toyotacan.create_acc_cancel_command(self.packer))
+    #     else:
+    #       can_sends.append(toyotacan.create_accel_command(self.packer, 0, pcm_cancel_cmd, True, False, lead, CS.acc_type, False, self.distance_button))
 
-    # *** hud ui ***
-    if self.CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
-      # ui mesg is at 1Hz but we send asap if:
-      # - there is something to display
-      # - there is something to stop displaying
-      send_ui = False
-      if ((fcw_alert or steer_alert) and not self.alert_active) or \
-         (not (fcw_alert or steer_alert) and self.alert_active):
-        send_ui = True
-        self.alert_active = not self.alert_active
-      elif pcm_cancel_cmd:
-        # forcing the pcm to disengage causes a bad fault sound so play a good sound instead
-        send_ui = True
+    # # *** hud ui ***
+    # if self.CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
+    #   # ui mesg is at 1Hz but we send asap if:
+    #   # - there is something to display
+    #   # - there is something to stop displaying
+    #   send_ui = False
+    #   if ((fcw_alert or steer_alert) and not self.alert_active) or \
+    #      (not (fcw_alert or steer_alert) and self.alert_active):
+    #     send_ui = True
+    #     self.alert_active = not self.alert_active
+    #   elif pcm_cancel_cmd:
+    #     # forcing the pcm to disengage causes a bad fault sound so play a good sound instead
+    #     send_ui = True
 
-      if self.frame % 20 == 0 or send_ui:
-        can_sends.append(toyotacan.create_ui_command(self.packer, steer_alert, pcm_cancel_cmd, hud_control.leftLaneVisible,
-                                                     hud_control.rightLaneVisible, hud_control.leftLaneDepart,
-                                                     hud_control.rightLaneDepart, CC.enabled, CS.lkas_hud))
+    #   if self.frame % 20 == 0 or send_ui:
+    #     can_sends.append(toyotacan.create_ui_command(self.packer, steer_alert, pcm_cancel_cmd, hud_control.leftLaneVisible,
+    #                                                  hud_control.rightLaneVisible, hud_control.leftLaneDepart,
+    #                                                  hud_control.rightLaneDepart, CC.enabled, CS.lkas_hud))
 
-      if (self.frame % 100 == 0 or send_ui) and (self.CP.enableDsu or self.CP.flags & ToyotaFlags.DISABLE_RADAR.value):
-        can_sends.append(toyotacan.create_fcw_command(self.packer, fcw_alert))
+    #   if (self.frame % 100 == 0 or send_ui) and (self.CP.enableDsu or self.CP.flags & ToyotaFlags.DISABLE_RADAR.value):
+    #     can_sends.append(toyotacan.create_fcw_command(self.packer, fcw_alert))
 
     # # *** static msgs ***
     # if self.CP.enableDsu:

@@ -57,6 +57,9 @@ static bool toyota_stock_longitudinal = false;
 static bool toyota_lta = false;
 static int toyota_dbc_eps_torque_factor = 100;   // conversion factor for STEER_TORQUE_EPS in %: see dbc file
 
+static bool lexus_ls_steering_bus = false;
+static bool lexus_ls_driving_bus = false;
+
 static uint32_t toyota_compute_checksum(const CANPacket_t *to_push) {
   int addr = GET_ADDR(to_push);
   int len = GET_LEN(to_push);
@@ -208,7 +211,7 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
   // Check if msg is sent on BUS 0
   if (bus == 0) {
     // ACCEL: safety check on byte 2-3
-    if (addr == 0x280) {
+    if (addr == 0x280 && lexus_ls_driving_bus) {
       int desired_accel = (GET_BYTE(to_send, 2) << 8) | GET_BYTE(to_send, 3);
       desired_accel = to_signed(desired_accel, 16);
 
@@ -303,7 +306,7 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
     }
 
     // STEER: safety check on bytes 2-3
-    if (addr == 0x180) {
+    if (addr == 0x180 && lexus_ls_steering_bus) {
       int desired_torque = (GET_BYTE(to_send, 1) << 8) | GET_BYTE(to_send, 2);
       desired_torque = to_signed(desired_torque, 16);
       bool steer_req = GET_BIT(to_send, 0U);
@@ -353,6 +356,9 @@ static safety_config toyota_init(uint16_t param) {
   const uint32_t TOYOTA_PARAM_STOCK_LONGITUDINAL = 2UL << TOYOTA_PARAM_OFFSET;
   const uint32_t TOYOTA_PARAM_LTA = 4UL << TOYOTA_PARAM_OFFSET;
 
+  const uint32_t LEXUS_LS_PARAM_STEERING_BUS = 16UL << TOYOTA_PARAM_OFFSET;
+  const uint32_t LEXUS_LS_PARAM_DRIVING_BUS = 32UL << TOYOTA_PARAM_OFFSET;
+
 #ifdef ALLOW_DEBUG
   const uint32_t TOYOTA_PARAM_SECOC = 8UL << TOYOTA_PARAM_OFFSET;
   toyota_secoc = GET_FLAG(param, TOYOTA_PARAM_SECOC);
@@ -362,6 +368,9 @@ static safety_config toyota_init(uint16_t param) {
   toyota_stock_longitudinal = GET_FLAG(param, TOYOTA_PARAM_STOCK_LONGITUDINAL);
   toyota_lta = GET_FLAG(param, TOYOTA_PARAM_LTA);
   toyota_dbc_eps_torque_factor = param & TOYOTA_EPS_FACTOR;
+
+  lexus_ls_steering_bus = GET_FLAG(param, LEXUS_LS_PARAM_STEERING_BUS);
+  lexus_ls_driving_bus = GET_FLAG(param, LEXUS_LS_PARAM_DRIVING_BUS);
 
   safety_config ret;
   if (toyota_stock_longitudinal) {
