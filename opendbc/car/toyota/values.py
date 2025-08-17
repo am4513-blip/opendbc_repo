@@ -55,7 +55,6 @@ class ToyotaSafetyFlags(IntFlag):
   STOCK_LONGITUDINAL = (2 << 8)
   LTA = (4 << 8)
   SECOC = (8 << 8)
-  
   LEXUS_LS_STEERING_BUS = (16 << 8) #First Panda (internal inside C3X)
   LEXUS_LS_DRIVING_BUS =  (32 << 8) #Second Panda (external)
 
