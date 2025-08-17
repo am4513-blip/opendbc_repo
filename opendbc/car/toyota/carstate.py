@@ -55,13 +55,14 @@ class CarState(CarStateBase):
 
   def update(self, can_parsers) -> structs.CarState:
     cp = can_parsers[Bus.pt]      # Lexus LS Steering BUS (CAN0)
+    cp_body = can_parsers[Bus.body] # Lexus LS Body BUS  (CAN1)
     cp_cam = can_parsers[Bus.cam] # Lexus LS Driving BUS  (CAN4)
 
     ret = structs.CarState()
     cp_acc = cp_cam if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR) else cp
 
-    if not self.CP.flags & ToyotaFlags.SECOC.value:
-      self.gvc = cp.vl["VSC1S07"]["GVC"]
+    # if not self.CP.flags & ToyotaFlags.SECOC.value:
+    #   self.gvc = cp.vl["VSC1S07"]["GVC"]
 
     ret.doorOpen = any([cp_cam.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FL"], cp_cam.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FR"],
                         cp_cam.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_RL"], cp_cam.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_RR"]])
@@ -69,7 +70,7 @@ class CarState(CarStateBase):
     ret.parkingBrake = cp_cam.vl["BODY_CONTROL_STATE"]["PARKING_BRAKE"] == 1
 
     ret.brakePressed = cp.vl["BRAKE_MODULE"]["BRAKE_PRESSED"] != 0
-    ret.brakeHoldActive = False #cp.vl["ESP_CONTROL"]["BRAKE_HOLD_ACTIVE"] == 1
+    ret.brakeHoldActive = cp_body.vl["ESP_CONTROL"]["BRAKE_HOLD_ACTIVE"] == 1  
 
     if self.CP.flags & ToyotaFlags.SECOC.value:
       self.secoc_synchronization = copy.copy(cp.vl["SECOC_SYNCHRONIZATION"])
@@ -77,12 +78,14 @@ class CarState(CarStateBase):
       ret.gasPressed = cp.vl["GAS_PEDAL"]["GAS_PEDAL_USER"] > 0
       can_gear = int(cp.vl["GEAR_PACKET_HYBRID"]["GEAR"])
     else:
-      ret.gasPressed = cp.vl["PCM_CRUISE"]["GAS_RELEASED"] == 0  # TODO: these also have GAS_PEDAL, come back and unify
+      #ret.gasPressed = cp.vl["PCM_CRUISE"]["GAS_RELEASED"] == 0  # TODO: these also have GAS_PEDAL, come back and unify
+      ret.gas = cp_cam.vl["GAS_PEDAL"]["GAS_PEDAL"]   #################################################
+      ret.gasPressed = ret.gas > 1000  #pedal is really sensitive  #################################################
       can_gear = int(cp.vl["GEAR_PACKET"]["GEAR"])
       if not self.CP.enableDsu and not self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
         ret.stockAeb = bool(cp_acc.vl["PRE_COLLISION"]["PRECOLLISION_ACTIVE"] and cp_acc.vl["PRE_COLLISION"]["FORCE"] < -1e-5)
       if self.CP.carFingerprint != CAR.TOYOTA_MIRAI:
-        ret.engineRpm = cp.vl["ENGINE_RPM"]["RPM"]
+        ret.engineRpm = 1000 #cp.vl["ENGINE_RPM"]["RPM"]   #################################################
 
     # ret.wheelSpeeds = self.get_wheel_speeds(
     #   cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_FL"],
@@ -93,10 +96,10 @@ class CarState(CarStateBase):
     
     #Lexus LS Wheels Speed on two different CAN Msgs
     ret.wheelSpeeds = self.get_wheel_speeds(
-      cp_cam.vl["WHEEL_SPEED_1"]["WHEEL_SPEED_FL"],
-      cp_cam.vl["WHEEL_SPEED_1"]["WHEEL_SPEED_FR"],
-      cp_cam.vl["WHEEL_SPEED_2"]["WHEEL_SPEED_RL"],
-      cp_cam.vl["WHEEL_SPEED_2"]["WHEEL_SPEED_RR"],)
+      cp_cam.vl["WHEEL_SPEED_1"]["WHEEL_SPEED_FL"],       #################################################
+      cp_cam.vl["WHEEL_SPEED_1"]["WHEEL_SPEED_FR"],       #################################################
+      cp_cam.vl["WHEEL_SPEED_2"]["WHEEL_SPEED_RL"],       #################################################
+      cp_cam.vl["WHEEL_SPEED_2"]["WHEEL_SPEED_RR"],)      #################################################
      
     ret.vEgoRaw = float(np.mean([ret.wheelSpeeds.fl, ret.wheelSpeeds.fr, ret.wheelSpeeds.rl, ret.wheelSpeeds.rr]))
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
@@ -105,7 +108,8 @@ class CarState(CarStateBase):
     ret.standstill = abs(ret.vEgoRaw) < 1e-3
 
     #ret.steeringAngleDeg = cp.vl["STEER_ANGLE_SENSOR"]["STEER_ANGLE"] + cp.vl["STEER_ANGLE_SENSOR"]["STEER_FRACTION"]
-    ret.steeringRateDeg = 0 #cp.vl["STEER_ANGLE_SENSOR"]["STEER_RATE"]
+    ret.steeringAngleDeg = cp.vl["STEER_ANGLE_SENSOR_VGRS"]["STEER_ANGLE"]  ###################################################
+    ret.steeringRateDeg = 0 #cp.vl["STEER_ANGLE_SENSOR"]["STEER_RATE"]   ###################################################
     torque_sensor_angle_deg = cp.vl["STEER_TORQUE_SENSOR"]["STEER_ANGLE"]
 
     # On some cars, the angle measurement is non-zero while initializing
@@ -122,8 +126,10 @@ class CarState(CarStateBase):
         ret.steeringAngleDeg = torque_sensor_angle_deg - self.angle_offset.x
 
     ret.gearShifter = self.parse_gear_shifter(self.shifter_values.get(can_gear, None))
-    ret.leftBlinker = cp.vl["BLINKERS_STATE"]["TURN_SIGNALS"] == 1
-    ret.rightBlinker = cp.vl["BLINKERS_STATE"]["TURN_SIGNALS"] == 2
+    #ret.leftBlinker = cp.vl["BLINKERS_STATE"]["TURN_SIGNALS"] == 1
+    #ret.rightBlinker = cp.vl["BLINKERS_STATE"]["TURN_SIGNALS"] == 2
+    ret.leftBlinker = cp.vl["BLINKERS_STATE"]["TURN_SIGNALS"] == 5   ################################################
+    ret.rightBlinker = cp.vl["BLINKERS_STATE"]["TURN_SIGNALS"] == 10 ################################################
 
     ret.steeringTorque = cp.vl["STEER_TORQUE_SENSOR"]["STEER_TORQUE_DRIVER"]
     ret.steeringTorqueEps = cp.vl["STEER_TORQUE_SENSOR"]["STEER_TORQUE_EPS"] * self.eps_torque_scale
@@ -144,12 +150,13 @@ class CarState(CarStateBase):
 
     if self.CP.carFingerprint in UNSUPPORTED_DSU_CAR:
       # TODO: find the bit likely in DSU_CRUISE that describes an ACC fault. one may also exist in CLUTCH
-      ret.cruiseState.available = cp.vl["DSU_CRUISE"]["MAIN_ON"] != 0
-      ret.cruiseState.speed = cp.vl["DSU_CRUISE"]["SET_SPEED"] * CV.KPH_TO_MS
-      cluster_set_speed = cp.vl["PCM_CRUISE_ALT"]["UI_SET_SPEED"]
+      #ret.cruiseState.available = cp.vl["DSU_CRUISE"]["MAIN_ON"] != 0
+      ret.cruiseState.available = cp_body.vl["PCM_CRUISE"]["RADAR_READY"] != 0 #############################################
+      ret.cruiseState.speed = cp_body.vl["PCM_CRUISE"]["UI_SET_SPEED"] #cp.vl["DSU_CRUISE"]["SET_SPEED"] * CV.KPH_TO_MS
+      cluster_set_speed = cp_body.vl["PCM_CRUISE"]["UI_SET_SPEED"] #cp.vl["PCM_CRUISE_ALT"]["UI_SET_SPEED"]
     else:
-      ret.accFaulted = cp.vl["PCM_CRUISE_2"]["ACC_FAULTED"] != 0
-      ret.carFaultedNonCritical = cp.vl["PCM_CRUISE_SM"]["TEMP_ACC_FAULTED"] != 0
+      ret.accFaulted = cp_cam.vl["VSC_DATA7"]["BRK_ERR_FLGS"] != 0 #cp.vl["PCM_CRUISE_2"]["ACC_FAULTED"] != 0 #######################
+      #ret.carFaultedNonCritical = cp.vl["PCM_CRUISE_SM"]["TEMP_ACC_FAULTED"] != 0
       ret.cruiseState.available = cp.vl["PCM_CRUISE_2"]["MAIN_ON"] != 0
       ret.cruiseState.speed = cp.vl["PCM_CRUISE_2"]["SET_SPEED"] * CV.KPH_TO_MS
       cluster_set_speed = cp.vl["PCM_CRUISE_SM"]["UI_SET_SPEED"]
@@ -171,32 +178,34 @@ class CarState(CarStateBase):
     if (self.CP.carFingerprint not in TSS2_CAR and self.CP.carFingerprint not in UNSUPPORTED_DSU_CAR) or \
        (self.CP.carFingerprint in TSS2_CAR and self.acc_type == 1):
       if self.CP.openpilotLongitudinalControl:
-        ret.accFaulted = ret.accFaulted or cp.vl["PCM_CRUISE_2"]["LOW_SPEED_LOCKOUT"] == 2
+        #ret.accFaulted = ret.accFaulted or cp.vl["PCM_CRUISE_2"]["LOW_SPEED_LOCKOUT"] == 2
+        ret.accFaulted = cp_cam.vl["VSC_DATA7"]["BRK_ERR_FLGS"] != 0 ################################################
 
-    self.pcm_acc_status = cp.vl["PCM_CRUISE"]["CRUISE_STATE"]
+    self.pcm_acc_status = 8 #cp.vl["PCM_CRUISE"]["CRUISE_STATE"] ###################################################
     if self.CP.carFingerprint not in (NO_STOP_TIMER_CAR - TSS2_CAR):
       # ignore standstill state in certain vehicles, since pcm allows to restart with just an acceleration request
       ret.cruiseState.standstill = self.pcm_acc_status == 7
-    ret.cruiseState.enabled = bool(cp.vl["PCM_CRUISE"]["CRUISE_ACTIVE"])
-    ret.cruiseState.nonAdaptive = self.pcm_acc_status in (1, 2, 3, 4, 5, 6)
+    #ret.cruiseState.enabled = bool(cp.vl["PCM_CRUISE"]["CRUISE_ACTIVE"])
+    ret.cruiseState.enabled = bool(cp_body.vl["PCM_CRUISE"]["CRUISE_ACTIVE"]) ##########################################
+    #ret.cruiseState.nonAdaptive = self.pcm_acc_status in (1, 2, 3, 4, 5, 6)
 
-    ret.genericToggle = bool(cp.vl["LIGHT_STALK"]["AUTO_HIGH_BEAM"])
-    ret.espDisabled = cp.vl["ESP_CONTROL"]["TC_DISABLED"] != 0
+    ret.genericToggle = bool(cp_cam.vl["LIGHT_STALK"]["AUTO_HIGH_BEAM"])
+    ret.espDisabled = cp_body.vl["ESP_CONTROL"]["TC_DISABLED"] != 0
 
     if self.CP.enableBsm:
       ret.leftBlindspot = (cp.vl["BSM"]["L_ADJACENT"] == 1) or (cp.vl["BSM"]["L_APPROACHING"] == 1)
       ret.rightBlindspot = (cp.vl["BSM"]["R_ADJACENT"] == 1) or (cp.vl["BSM"]["R_APPROACHING"] == 1)
 
-    if self.CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
-      self.lkas_hud = copy.copy(cp_cam.vl["LKAS_HUD"])
+    # if self.CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
+    #   self.lkas_hud = copy.copy(cp_cam.vl["LKAS_HUD"])
 
     if self.CP.carFingerprint not in UNSUPPORTED_DSU_CAR:
-      self.pcm_follow_distance = cp.vl["PCM_CRUISE_2"]["PCM_FOLLOW_DISTANCE"]
+      self.pcm_follow_distance = 1 #cp.vl["PCM_CRUISE_2"]["PCM_FOLLOW_DISTANCE"]
 
     if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR):
       # distance button is wired to the ACC module (camera or radar)
       prev_distance_button = self.distance_button
-      self.distance_button = cp_acc.vl["ACC_CONTROL"]["DISTANCE"]
+      self.distance_button = 1 #cp_acc.vl["ACC_CONTROL"]["DISTANCE"]  ######################################
 
       ret.buttonEvents = create_button_events(self.distance_button, prev_distance_button, {1: ButtonType.gapAdjustCruise})
 
@@ -289,8 +298,14 @@ class CarState(CarStateBase):
     #     cam_messages += [
     #       ("PRE_COLLISION", 33),
     #     ]
+    
+    body_messages = []
+    if CP.carFingerprint == CAR.LEXUS_LS:
+      body_messages += [  ("ESP_CONTROL", 3),  #3B7 on Body BUS
+                          ("PCM_CRUISE", 1),]  #689 on Body BUS
 
     return {
       Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], pt_messages, 0),
+      Bus.body: CANParser(DBC[CP.carFingerprint][Bus.pt], body_messages, 1),
       Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], cam_messages, 4),
     }
