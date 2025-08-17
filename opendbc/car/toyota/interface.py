@@ -30,7 +30,7 @@ class CarInterface(CarInterfaceBase):
     
     if candidate == CAR.LEXUS_LS:
       ret.safetyConfigs[0].safetyParam |= ToyotaSafetyFlags.LEXUS_LS_STEERING_BUS.value
-      ret.safetyConfigs[0].safetyParam |= ToyotaSafetyFlags.LEXUS_LS_DRIVING_BUS.value
+      ret.safetyConfigs[1].safetyParam |= ToyotaSafetyFlags.LEXUS_LS_DRIVING_BUS.value
       
 
     # BRAKE_MODULE is on a different address for these cars
