@@ -24,12 +24,15 @@ class CarInterface(CarInterfaceBase):
   def _get_params(ret: structs.CarParams, candidate, fingerprint, car_fw, alpha_long, is_release, docs) -> structs.CarParams:
     ret.brand = "toyota"
     #TODO: Add if cond to set safety config based on Lexus LS
-    ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.toyota, ToyotaSafetyFlags.LEXUS_LS_STEERING_BUS),
-                         get_safety_config(structs.CarParams.SafetyModel.toyota, ToyotaSafetyFlags.LEXUS_LS_DRIVING_BUS),]
+    ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.toyota),
+                         get_safety_config(structs.CarParams.SafetyModel.toyota),]
     ret.safetyConfigs[0].safetyParam = EPS_SCALE[candidate]
-    ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.toyota, 4096 ),
-                         get_safety_config(car.CarParams.SafetyModel.toyota, 8192 ),
-                         get_safety_config(car.CarParams.SafetyModel.toyota, 16384 ),]
+    
+    if candidate == CAR.LEXUS_LS:
+      ret.safetyConfigs[0].safetyParam |= ToyotaSafetyFlags.LEXUS_LS_STEERING_BUS
+      ret.safetyConfigs[0].safetyParam |= ToyotaSafetyFlags.LEXUS_LS_DRIVING_BUS
+      
+
     # BRAKE_MODULE is on a different address for these cars
     if DBC[candidate][Bus.pt] == "toyota_new_mc_pt_generated":
       ret.safetyConfigs[0].safetyParam |= ToyotaSafetyFlags.ALT_BRAKE.value
