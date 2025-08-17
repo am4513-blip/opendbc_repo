@@ -9,12 +9,12 @@
 #define TOYOTA_COMMON_TX_MSGS \
   TOYOTA_BASE_TX_MSGS \
   {0x180, 0, 5, .check_relay = true}, \
-  {0x343, 0, 8, .check_relay = false},  /* ACC cancel cmd */  \
+  {0x280, 0, 8, .check_relay = false},  /* ACC cancel cmd */  \
 
 #define TOYOTA_COMMON_SECOC_TX_MSGS \
   TOYOTA_BASE_TX_MSGS \
   {0x180, 0, 8, .check_relay = true}, {0x131, 0, 8, .check_relay = true}, \
-  {0x343, 0, 8, .check_relay = false},  /* ACC cancel cmd */  \
+  {0x280, 0, 8, .check_relay = false},  /* ACC cancel cmd */  \
 
 #define TOYOTA_COMMON_LONG_TX_MSGS \
   TOYOTA_COMMON_TX_MSGS \
@@ -29,7 +29,7 @@
   /* radar diagnostic address */       \
   {0x750, 0, 8, .check_relay = false}, \
   /* ACC */                            \
-  {0x343, 0, 8, .check_relay = true},  \
+  {0x280, 0, 8, .check_relay = true},  \
 
 #define TOYOTA_COMMON_RX_CHECKS(lta)                                                                                                       \
   {.msg = {{ 0xaa, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}},  \
@@ -192,7 +192,7 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
     },
   };
 
-  const int TOYOTA_LTA_MAX_MEAS_TORQUE = 1500;
+  const int TOYOTA_LTA_MAX_MEAS_TORQUE = 1100;
   const int TOYOTA_LTA_MAX_DRIVER_TORQUE = 150;
 
   // longitudinal limits
@@ -207,9 +207,9 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
 
   // Check if msg is sent on BUS 0
   if (bus == 0) {
-    // ACCEL: safety check on byte 1-2
-    if (addr == 0x343) {
-      int desired_accel = (GET_BYTE(to_send, 0) << 8) | GET_BYTE(to_send, 1);
+    // ACCEL: safety check on byte 2-3
+    if (addr == 0x280) {
+      int desired_accel = (GET_BYTE(to_send, 2) << 8) | GET_BYTE(to_send, 3);
       desired_accel = to_signed(desired_accel, 16);
 
       bool violation = false;
