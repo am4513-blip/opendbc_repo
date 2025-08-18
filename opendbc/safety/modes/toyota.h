@@ -8,12 +8,12 @@
 
 #define TOYOTA_COMMON_TX_MSGS \
   TOYOTA_BASE_TX_MSGS \
-  {0x180, 0, 5, .check_relay = true}, \
+  {0x2E4, 0, 5, .check_relay = true}, \
   {0x280, 0, 8, .check_relay = false},  /* ACC cancel cmd */  \
 
 #define TOYOTA_COMMON_SECOC_TX_MSGS \
   TOYOTA_BASE_TX_MSGS \
-  {0x180, 0, 8, .check_relay = true}, {0x131, 0, 8, .check_relay = true}, \
+  {0x2E4, 0, 8, .check_relay = true}, {0x131, 0, 8, .check_relay = true}, \
   {0x280, 0, 8, .check_relay = false},  /* ACC cancel cmd */  \
 
 #define TOYOTA_COMMON_LONG_TX_MSGS \
@@ -57,8 +57,8 @@ static bool toyota_stock_longitudinal = false;
 static bool toyota_lta = false;
 static int toyota_dbc_eps_torque_factor = 100;   // conversion factor for STEER_TORQUE_EPS in %: see dbc file
 
-static bool lexus_ls_steering_bus = false;
-static bool lexus_ls_driving_bus = false;
+static bool lexus_ls_steering_bus_panda = false;
+static bool lexus_ls_driving_bus_panda = false;
 
 static bool myflag = false;
 
@@ -144,23 +144,43 @@ static void toyota_rx_hook(const CANPacket_t *to_push) {
       if (!toyota_alt_brake && (addr == 0x226)) {
         brake_pressed = GET_BIT(to_push, 37U);  // BRAKE_MODULE.BRAKE_PRESSED (toyota_nodsu_pt_generated.dbc)
       }
-      if (toyota_alt_brake && (addr == 0x224)) {
+      if (toyota_alt_brake && (addr == 0x224 && lexus_ls_steering_bus_panda )) {
         brake_pressed = GET_BIT(to_push, 5U);  // BRAKE_MODULE.BRAKE_PRESSED (toyota_new_mc_pt_generated.dbc)
       }
     }
 
     // sample speed
-    if (addr == 0xaa) {
+    if ((addr == 0xB0 || addr == 0xB0)  && lexus_ls_driving_bus_panda) 
+    {
       int speed = 0;
-      // sum 4 wheel speeds. conversion: raw * 0.01 - 67.67
-      for (uint8_t i = 0U; i < 8U; i += 2U) {
+      // sum wheel speeds. conversion: raw * 0.01
+      for (uint8_t i = 0U; i < 4U; i += 2U) { //sum two wheel speeds for each CAN message (0xB0 and 0xB2)
         int wheel_speed = (GET_BYTE(to_push, i) << 8U) | GET_BYTE(to_push, (i + 1U));
-        speed += wheel_speed - 6767;
+        speed += wheel_speed;
       }
       // check that all wheel speeds are at zero value
       vehicle_moving = speed != 0;
 
-      UPDATE_VEHICLE_SPEED(speed / 4.0 * 0.01 * KPH_TO_MS);
+      UPDATE_VEHICLE_SPEED(speed / 2.0 * 0.01 * KPH_TO_MS);
+    }
+  }
+
+  if (GET_BUS(to_push) == 1U && lexus_ls_steering_bus_panda) 
+  {
+    int addr = GET_ADDR(to_push);
+    if (addr == 0x689)
+    {
+      bool cruise_engaged = GET_BIT(to_push, 17U);  // PCM_CRUISE.CRUISE_ACTIVE
+      pcm_cruise_check(cruise_engaged);
+    }
+  }
+  if (GET_BUS(to_push) == 2U && lexus_ls_driving_bus_panda) 
+  {
+    int addr = GET_ADDR(to_push);
+    if (addr == 0x280) 
+    {
+      bool cruise_engaged = GET_BIT(to_push, 34U);  // PCM_CRUISE.CRUISE_ACTIVE
+      pcm_cruise_check(cruise_engaged);
     }
   }
 }
@@ -213,7 +233,7 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
   // Check if msg is sent on BUS 0
   if (bus == 0) {
     // ACCEL: safety check on byte 2-3
-    if (addr == 0x280 && lexus_ls_driving_bus) {
+    if (addr == 0x280 && lexus_ls_driving_bus_panda) {
       int desired_accel = (GET_BYTE(to_send, 2) << 8) | GET_BYTE(to_send, 3);
       desired_accel = to_signed(desired_accel, 16);
 
@@ -308,7 +328,7 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
     }
 
     // STEER: safety check on bytes 2-3
-    if (addr == 0x180 && myflag) {
+    if (addr == 0x2E4 && myflag) {
       int desired_torque = (GET_BYTE(to_send, 1) << 8) | GET_BYTE(to_send, 2);
       desired_torque = to_signed(desired_torque, 16);
       bool steer_req = GET_BIT(to_send, 0U);
@@ -358,8 +378,8 @@ static safety_config toyota_init(uint16_t param) {
   const uint32_t TOYOTA_PARAM_STOCK_LONGITUDINAL = 2UL << TOYOTA_PARAM_OFFSET;
   const uint32_t TOYOTA_PARAM_LTA = 4UL << TOYOTA_PARAM_OFFSET;
 
-  const uint32_t LEXUS_LS_PARAM_STEERING_BUS = 16UL << TOYOTA_PARAM_OFFSET;
-  const uint32_t LEXUS_LS_PARAM_DRIVING_BUS = 32UL << TOYOTA_PARAM_OFFSET;
+  const uint32_t LEXUS_LS_PARAM_STEERING_BUS_PANDA = 16UL << TOYOTA_PARAM_OFFSET;
+  const uint32_t LEXUS_LS_PARAM_DRIVING_BUS_PANDA = 32UL << TOYOTA_PARAM_OFFSET;
 
 #ifdef ALLOW_DEBUG
   const uint32_t TOYOTA_PARAM_SECOC = 8UL << TOYOTA_PARAM_OFFSET;
@@ -371,8 +391,8 @@ static safety_config toyota_init(uint16_t param) {
   toyota_lta = GET_FLAG(param, TOYOTA_PARAM_LTA);
   toyota_dbc_eps_torque_factor = param & TOYOTA_EPS_FACTOR;
 
-  lexus_ls_steering_bus = GET_FLAG(param, LEXUS_LS_PARAM_STEERING_BUS);
-  lexus_ls_driving_bus = GET_FLAG(param, LEXUS_LS_PARAM_DRIVING_BUS);
+  lexus_ls_steering_bus_panda = GET_FLAG(param, LEXUS_LS_PARAM_STEERING_BUS_PANDA);
+  lexus_ls_driving_bus_panda = GET_FLAG(param, LEXUS_LS_PARAM_DRIVING_BUS_PANDA);
 
   safety_config ret;
   if (toyota_stock_longitudinal) {
