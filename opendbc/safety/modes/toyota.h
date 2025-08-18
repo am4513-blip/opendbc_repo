@@ -60,8 +60,6 @@ static int toyota_dbc_eps_torque_factor = 100;   // conversion factor for STEER_
 static bool lexus_ls_steering_bus_panda = false;
 static bool lexus_ls_driving_bus_panda = false;
 
-static bool my_flag = false;
-
 static uint32_t toyota_compute_checksum(const CANPacket_t *to_push) {
   int addr = GET_ADDR(to_push);
   int len = GET_LEN(to_push);
@@ -328,8 +326,7 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
     }
 
     // STEER: safety check on bytes 2-3
-    my_flag = false;
-    if ((addr == 0x180) && (my_flag)) {
+    if ((addr == 0x180) && (lexus_ls_driving_bus_panda)) {
       int desired_torque = (GET_BYTE(to_send, 1) << 8) | GET_BYTE(to_send, 2);
       desired_torque = to_signed(desired_torque, 16);
       bool steer_req = GET_BIT(to_send, 0U);
