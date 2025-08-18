@@ -60,8 +60,6 @@ static int toyota_dbc_eps_torque_factor = 100;   // conversion factor for STEER_
 static bool lexus_ls_steering_bus_panda = false;
 static bool lexus_ls_driving_bus_panda = false;
 
-static bool myflag = false;
-
 static uint32_t toyota_compute_checksum(const CANPacket_t *to_push) {
   int addr = GET_ADDR(to_push);
   int len = GET_LEN(to_push);
