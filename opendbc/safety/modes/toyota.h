@@ -9,12 +9,12 @@
 #define TOYOTA_COMMON_TX_MSGS \
   TOYOTA_BASE_TX_MSGS \
   {0x180, 0, 5, .check_relay = true}, \
-  {0x280, 0, 8, .check_relay = false},  /* ACC cancel cmd */  \
+  {0x280, 0, 8, .check_relay = true},  /* ACC cancel cmd */  \
 
 #define TOYOTA_COMMON_SECOC_TX_MSGS \
   TOYOTA_BASE_TX_MSGS \
   {0x2E4, 0, 8, .check_relay = true}, {0x131, 0, 8, .check_relay = true}, \
-  {0x280, 0, 8, .check_relay = false},  /* ACC cancel cmd */  \
+  {0x343, 0, 8, .check_relay = false},  /* ACC cancel cmd */  \
 
 #define TOYOTA_COMMON_LONG_TX_MSGS \
   TOYOTA_COMMON_TX_MSGS \
@@ -163,21 +163,12 @@ static void toyota_rx_hook(const CANPacket_t *to_push) {
     }
   }
 
-  if (GET_BUS(to_push) == 1U && lexus_ls_steering_bus_panda) 
+  if (GET_BUS(to_push) == 1U) 
   {
     int addr = GET_ADDR(to_push);
     if (addr == 0x689)
     {
       bool cruise_engaged = GET_BIT(to_push, 17U);  // PCM_CRUISE.CRUISE_ACTIVE
-      pcm_cruise_check(cruise_engaged);
-    }
-  }
-  if (GET_BUS(to_push) == 2U && lexus_ls_driving_bus_panda) 
-  {
-    int addr = GET_ADDR(to_push);
-    if (addr == 0x280) 
-    {
-      bool cruise_engaged = GET_BIT(to_push, 34U);  // PCM_CRUISE.CRUISE_ACTIVE
       pcm_cruise_check(cruise_engaged);
     }
   }
