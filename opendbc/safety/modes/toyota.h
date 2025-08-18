@@ -328,7 +328,8 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
     }
 
     // STEER: safety check on bytes 2-3
-    if (addr == 0x2E4 && my_flag) {
+    my_flag = false;
+    if ((addr == 0x180) && (my_flag)) {
       int desired_torque = (GET_BYTE(to_send, 1) << 8) | GET_BYTE(to_send, 2);
       desired_torque = to_signed(desired_torque, 16);
       bool steer_req = GET_BIT(to_send, 0U);
