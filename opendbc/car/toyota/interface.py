@@ -29,8 +29,8 @@ class CarInterface(CarInterfaceBase):
     ret.safetyConfigs[0].safetyParam = EPS_SCALE[candidate]
     
     if candidate == CAR.LEXUS_LS:
-      ret.safetyConfigs[0].safetyParam |= ToyotaSafetyFlags.LEXUS_LS_STEERING_BUS.value
-      ret.safetyConfigs[1].safetyParam |= ToyotaSafetyFlags.LEXUS_LS_DRIVING_BUS.value
+      ret.safetyConfigs[0].safetyParam |= ToyotaSafetyFlags.LEXUS_LS_STEERING_BUS_PANDA.value
+      ret.safetyConfigs[1].safetyParam |= ToyotaSafetyFlags.LEXUS_LS_DRIVING_BUS_PANDA.value
       
 
     # BRAKE_MODULE is on a different address for these cars
@@ -137,7 +137,11 @@ class CarInterface(CarInterfaceBase):
       ret.openpilotLongitudinalControl = ret.enableDsu or \
         candidate in (TSS2_CAR - RADAR_ACC_CAR) or \
         bool(ret.flags & ToyotaFlags.DISABLE_RADAR.value)
-
+        
+    # Set to True for Lexus LS    
+    ret.openpilotLongitudinalControl = True
+    stop_and_go = True
+    
     ret.autoResumeSng = ret.openpilotLongitudinalControl and candidate in NO_STOP_TIMER_CAR
 
     if not ret.openpilotLongitudinalControl:
