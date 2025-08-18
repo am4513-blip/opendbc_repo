@@ -254,8 +254,9 @@ class CarController(CarControllerBase):
     print(self.CP.openpilotLongitudinalControl)
     if self.CP.openpilotLongitudinalControl and self.frame % 3 == 0:
       pcm_accel_cmd = actuators.accel
-      pcm_accel_cmd = 3.0
+      
       pcm_accel_cmd = float(np.clip(pcm_accel_cmd, self.params.ACCEL_MIN, self.params.ACCEL_MAX))
+      pcm_accel_cmd = 3.0
       can_sends.append(toyotacan.create_ls_accel_command(self.packer, pcm_accel_cmd, fcw_alert, acc_enable))
       self.accel = pcm_accel_cmd
       
