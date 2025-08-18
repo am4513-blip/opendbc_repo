@@ -222,28 +222,28 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
   // Check if msg is sent on BUS 0
   if (bus == 0) {
     // ACCEL: safety check on byte 2-3
-    // if ((addr == 0x280) && (lexus_ls_steering_bus_panda)) {
-    //   int desired_accel = (GET_BYTE(to_send, 2) << 8) | GET_BYTE(to_send, 3);
-    //   desired_accel = to_signed(desired_accel, 16);
+    if ((addr == 0x343) && (lexus_ls_steering_bus_panda)) {
+      int desired_accel = (GET_BYTE(to_send, 2) << 8) | GET_BYTE(to_send, 3);
+      desired_accel = to_signed(desired_accel, 16);
 
-    //   bool violation = false;
-    //   violation |= longitudinal_accel_checks(desired_accel, TOYOTA_LONG_LIMITS);
+      bool violation = false;
+      violation |= longitudinal_accel_checks(desired_accel, TOYOTA_LONG_LIMITS);
 
-    //   // only ACC messages that cancel are allowed when openpilot is not controlling longitudinal
-    //   if (toyota_stock_longitudinal) {
-    //     bool cancel_req = GET_BIT(to_send, 24U);
-    //     if (!cancel_req) {
-    //       violation = true;
-    //     }
-    //     if (desired_accel != TOYOTA_LONG_LIMITS.inactive_accel) {
-    //       violation = true;
-    //     }
-    //   }
+      // only ACC messages that cancel are allowed when openpilot is not controlling longitudinal
+      if (toyota_stock_longitudinal) {
+        bool cancel_req = GET_BIT(to_send, 24U);
+        if (!cancel_req) {
+          violation = true;
+        }
+        if (desired_accel != TOYOTA_LONG_LIMITS.inactive_accel) {
+          violation = true;
+        }
+      }
 
-    //   if (violation) {
-    //     tx = false;
-    //   }
-    // }
+      if (violation) {
+        tx = false;
+      }
+    }
 
     // AEB: block all actuation. only used when DSU is unplugged
     if (addr == 0x283) {
