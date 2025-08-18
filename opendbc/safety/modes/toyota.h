@@ -231,7 +231,7 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
   // Check if msg is sent on BUS 0
   if (bus == 0) {
     // ACCEL: safety check on byte 2-3
-    if (addr == 0x280 && lexus_ls_driving_bus_panda) {
+    if ((addr == 0x280) && (lexus_ls_driving_bus_panda)) {
       int desired_accel = (GET_BYTE(to_send, 2) << 8) | GET_BYTE(to_send, 3);
       desired_accel = to_signed(desired_accel, 16);
 
