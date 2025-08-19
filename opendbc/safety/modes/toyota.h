@@ -2,10 +2,10 @@
 
 #include "opendbc/safety/safety_declarations.h"
 
-#define LEXUS_LS_STEERING_TX_MSGS \
+#define LEXUS_LS_STEERING_TX_MSGS     \
   {0x180, 0, 5, .check_relay = true}, \
 
-#define LEXUS_LS_DRIVING_TX_MSGS \
+#define LEXUS_LS_DRIVING_TX_MSGS      \
   {0x280, 0, 8, .check_relay = true}, \
 
 // Stock longitudinal
@@ -414,6 +414,14 @@ static safety_config toyota_init(uint16_t param) {
     TOYOTA_COMMON_LONG_TX_MSGS
   };
 
+  static const CanMsg LEXUS_LS_LONG_TX_MSGS[] = {
+    LEXUS_LS_DRIVING_TX_MSGS
+  };
+
+  static const CanMsg LEXUS_LS_LAT_TX_MSGS[] = {
+    LEXUS_LS_STEERING_TX_MSGS
+  };
+
   // safety param flags
   // first byte is for EPS factor, second is for flags
   const uint32_t TOYOTA_PARAM_OFFSET = 8U;
@@ -443,11 +451,11 @@ static safety_config toyota_init(uint16_t param) {
 
   if(lexus_ls_steering_bus_panda)
   {
-    SET_TX_MSGS(LEXUS_LS_STEERING_TX_MSGS, ret);
+    SET_TX_MSGS(LEXUS_LS_LAT_TX_MSGS, ret);
   }
   else if(lexus_ls_driving_bus_panda)
   {
-    SET_TX_MSGS(LEXUS_LS_DRIVING_TX_MSGS, ret);
+    SET_TX_MSGS(LEXUS_LS_LONG_TX_MSGS, ret);
   }
 
   // if (toyota_stock_longitudinal) 
