@@ -463,14 +463,14 @@ static safety_config toyota_init(uint16_t param) {
   if(lexus_ls_steering_bus_panda)
   {
     static RxCheck lexus_ls_rx_checks[] = {
-      LEXUS_LS_STEERING_BUS_RX_CHECKS(lta)
+      LEXUS_LS_STEERING_BUS_RX_CHECKS(false)
     };
     SET_RX_CHECKS(lexus_ls_rx_checks, ret);
   }
   else if(lexus_ls_driving_bus_panda)
   {
     static RxCheck lexus_ls_rx_checks[] = {
-      LEXUS_LS_DRIVING_BUS_RX_CHECKS(lta)
+      LEXUS_LS_DRIVING_BUS_RX_CHECKS(false)
     };
     SET_RX_CHECKS(lexus_ls_rx_checks, ret);
   }
