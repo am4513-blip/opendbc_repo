@@ -96,6 +96,11 @@ class Bus(StrEnum):
   main = auto()
   party = auto()
   ap_party = auto()
+  
+  #Lexus LS CAN busses
+  dsu_drv_bus = auto()
+  dsu_str_bus = auto()
+  dsu_bdy_bus = auto()
 
 
 def apply_driver_steer_torque_limits(apply_torque: int, apply_torque_last: int, driver_torque: float, LIMITS, steer_max: int = None):
