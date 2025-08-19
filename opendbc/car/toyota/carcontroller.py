@@ -87,10 +87,6 @@ class CarController(CarControllerBase):
     lat_active = CC.latActive and abs(CS.out.steeringTorque) < MAX_USER_TORQUE
     if CC.enabled:
       acc_enable = 132
-      # if self.prev_set_speed != CS.cc_set_speed:
-      #   self.pcm_msg_chng = True
-      # else:
-      #   self.pcm_msg_chng = False
     else:
       acc_enable = 0
 
@@ -125,8 +121,6 @@ class CarController(CarControllerBase):
     # *** steer angle ***
     if self.CP.steerControlType == SteerControlType.angle:
       # If using LTA control, disable LKA and set steering angle command
-      apply_torque = 0
-      apply_steer_req = False
       if self.frame % 2 == 0:
         # EPS uses the torque sensor angle to control with, offset to compensate
         apply_angle = actuators.steeringAngleDeg + CS.out.steeringAngleOffsetDeg
