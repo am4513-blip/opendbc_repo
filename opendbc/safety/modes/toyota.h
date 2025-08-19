@@ -138,6 +138,15 @@ static void toyota_rx_hook(const CANPacket_t *to_push)
         brake_pressed = GET_BIT(to_push, 5U);  // BRAKE_MODULE.BRAKE_PRESSED (toyota_new_mc_pt_generated.dbc)
       }
     }
+    if (GET_BUS(to_push) == 1U) 
+    {
+     int addr = GET_ADDR(to_push);
+     if (addr == 0x689) 
+     {
+       bool cruise_engaged = GET_BIT(to_push, 17U);  // PCM_CRUISE.CRUISE_ACTIVE
+       pcm_cruise_check(cruise_engaged);
+     }
+   }
   }
 
 
@@ -179,15 +188,7 @@ static void toyota_rx_hook(const CANPacket_t *to_push)
    }
   }
     
-  if (GET_BUS(to_push) == 1U) 
-  {
-    int addr = GET_ADDR(to_push);
-    if (addr == 0x689) 
-    {
-      bool cruise_engaged = GET_BIT(to_push, 17U);  // PCM_CRUISE.CRUISE_ACTIVE
-      pcm_cruise_check(cruise_engaged);
-    }
-  }
+
 
 
 
