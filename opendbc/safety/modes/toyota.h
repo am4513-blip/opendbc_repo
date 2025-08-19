@@ -2,6 +2,12 @@
 
 #include "opendbc/safety/safety_declarations.h"
 
+#define LEXUS_LS_STEERING_TX_MSGS \
+  {0x180, 0, 5, .check_relay = true}, \
+
+#define LEXUS_LS_DRIVING_TX_MSGS \
+  {0x280, 0, 8, .check_relay = true}, \
+
 // Stock longitudinal
 #define TOYOTA_BASE_TX_MSGS \
   {0x191, 0, 8, .check_relay = true}, {0x412, 0, 8, .check_relay = true}, {0x1D2, 0, 8, .check_relay = false},  /* LKAS + LTA + PCM cancel cmd */  \
@@ -434,18 +440,28 @@ static safety_config toyota_init(uint16_t param) {
 
   safety_config ret;
 
-  if (toyota_stock_longitudinal) 
+
+  if(lexus_ls_steering_bus_panda)
   {
-    if (toyota_secoc) {
-      SET_TX_MSGS(TOYOTA_SECOC_TX_MSGS, ret);
-    } else {
-      SET_TX_MSGS(TOYOTA_TX_MSGS, ret);
-    }
-  } 
-  else 
-  {
-    SET_TX_MSGS(TOYOTA_LONG_TX_MSGS, ret);
+    SET_TX_MSGS(LEXUS_LS_STEERING_TX_MSGS, ret);
   }
+  else if(lexus_ls_driving_bus_panda)
+  {
+    SET_TX_MSGS(LEXUS_LS_DRIVING_TX_MSGS, ret);
+  }
+
+  // if (toyota_stock_longitudinal) 
+  // {
+  //   if (toyota_secoc) {
+  //     SET_TX_MSGS(TOYOTA_SECOC_TX_MSGS, ret);
+  //   } else {
+  //     SET_TX_MSGS(TOYOTA_TX_MSGS, ret);
+  //   }
+  // } 
+  // else 
+  // {
+  //   SET_TX_MSGS(TOYOTA_LONG_TX_MSGS, ret);
+  // }
 
   // if (toyota_secoc) 
   // {
