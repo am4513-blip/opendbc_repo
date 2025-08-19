@@ -87,10 +87,10 @@ class CarController(CarControllerBase):
     lat_active = CC.latActive and abs(CS.out.steeringTorque) < MAX_USER_TORQUE
     if CC.enabled:
       acc_enable = 132
-      if self.prev_set_speed != CS.cc_set_speed:
-        self.pcm_msg_chng = True
-      else:
-        self.pcm_msg_chng = False
+      # if self.prev_set_speed != CS.cc_set_speed:
+      #   self.pcm_msg_chng = True
+      # else:
+      #   self.pcm_msg_chng = False
     else:
       acc_enable = 0
 
