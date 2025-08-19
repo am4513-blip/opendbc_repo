@@ -36,7 +36,7 @@
   {.msg = {{ 0xB0, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}},  \
   {.msg = {{ 0xB2, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}},  \
   {.msg = {{ 0x2C1, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 31U}, { 0 }, { 0 }}}, \
-   
+  {.msg = {{ 0x280, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 31U}, { 0 }, { 0 }}}, \
 
 #define LEXUS_LS_STEERING_BUS_RX_CHECKS(lta)                                                                                               \
  {.msg = {{0x224, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 40U}, { 0 }, { 0 }}},   \
@@ -167,6 +167,15 @@ static void toyota_rx_hook(const CANPacket_t *to_push)
       {
           gas_pressed = ( (GET_BYTE(to_push, 6) << 8) | (GET_BYTE(to_push, 7)) ) > 1000; //pedal is really sensitive
       }
+   }
+   if (GET_BUS(to_push) == 2U) 
+   {
+     int addr = GET_ADDR(to_push);
+     if (addr == 0x280) 
+     {
+       bool cruise_engaged = GET_BIT(to_push, 34U);  // PCM_CRUISE.CRUISE_ACTIVE
+       pcm_cruise_check(cruise_engaged);
+     }
    }
   }
     
