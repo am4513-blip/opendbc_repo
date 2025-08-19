@@ -75,6 +75,9 @@ class CarController(CarControllerBase):
     self.secoc_lka_message_counter = 0
     self.secoc_lta_message_counter = 0
     self.secoc_prev_reset_counter = 0
+    
+    #Lexus LS vars
+    self.prev_set_speed = 0
 
   def update(self, CC, CS, now_nanos):
     actuators = CC.actuators
@@ -251,7 +254,7 @@ class CarController(CarControllerBase):
     #     self.accel = pcm_accel_cmd
         
         
-    print(self.CP.openpilotLongitudinalControl)
+    
     if self.CP.openpilotLongitudinalControl and self.frame % 3 == 0:
       pcm_accel_cmd = actuators.accel
       pcm_accel_cmd = float(np.clip(pcm_accel_cmd, self.params.ACCEL_MIN, self.params.ACCEL_MAX))
