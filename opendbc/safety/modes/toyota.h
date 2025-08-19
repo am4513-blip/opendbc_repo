@@ -366,21 +366,21 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
     }
 
     // STEER: safety check on bytes 2-3
-    if ((addr == 0x180) && (lexus_ls_steering_bus_panda)) {
-      int desired_torque = (GET_BYTE(to_send, 1) << 8) | GET_BYTE(to_send, 2);
-      desired_torque = to_signed(desired_torque, 16);
-      bool steer_req = GET_BIT(to_send, 0U);
-      // When using LTA (angle control), assert no actuation on LKA message
-      if (!toyota_lta) {
-        if (steer_torque_cmd_checks(desired_torque, steer_req, TOYOTA_TORQUE_STEERING_LIMITS)) {
-          tx = false;
-        }
-      } else {
-        if ((desired_torque != 0) || steer_req) {
-          tx = false;
-        }
-      }
-    }
+    // if (addr == 0x180) {
+    //   int desired_torque = (GET_BYTE(to_send, 1) << 8) | GET_BYTE(to_send, 2);
+    //   desired_torque = to_signed(desired_torque, 16);
+    //   bool steer_req = GET_BIT(to_send, 0U);
+    //   // When using LTA (angle control), assert no actuation on LKA message
+    //   if (!toyota_lta) {
+    //     if (steer_torque_cmd_checks(desired_torque, steer_req, TOYOTA_TORQUE_STEERING_LIMITS)) {
+    //       tx = false;
+    //     }
+    //   } else {
+    //     if ((desired_torque != 0) || steer_req) {
+    //       tx = false;
+    //     }
+    //   }
+    // }
   }
 
   // UDS: Only tester present ("\x0F\x02\x3E\x00\x00\x00\x00\x00") allowed on diagnostics address
