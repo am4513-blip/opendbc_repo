@@ -402,17 +402,17 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
 }
 
 static safety_config toyota_init(uint16_t param) {
-  static const CanMsg TOYOTA_TX_MSGS[] = {
-    TOYOTA_COMMON_TX_MSGS
-  };
+  // static const CanMsg TOYOTA_TX_MSGS[] = {
+  //   TOYOTA_COMMON_TX_MSGS
+  // };
 
-  static const CanMsg TOYOTA_SECOC_TX_MSGS[] = {
-    TOYOTA_COMMON_SECOC_TX_MSGS
-  };
+  // static const CanMsg TOYOTA_SECOC_TX_MSGS[] = {
+  //   TOYOTA_COMMON_SECOC_TX_MSGS
+  // };
 
-  static const CanMsg TOYOTA_LONG_TX_MSGS[] = {
-    TOYOTA_COMMON_LONG_TX_MSGS
-  };
+  // static const CanMsg TOYOTA_LONG_TX_MSGS[] = {
+  //   TOYOTA_COMMON_LONG_TX_MSGS
+  // };
 
   static const CanMsg LEXUS_LS_LONG_TX_MSGS[] = {
     LEXUS_LS_DRIVING_TX_MSGS
