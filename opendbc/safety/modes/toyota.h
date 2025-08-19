@@ -35,7 +35,8 @@
 #define LEXUS_LS_DRIVING_BUS_RX_CHECKS(lta)                                                                                                \
   {.msg = {{ 0xB0, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}},  \
   {.msg = {{ 0xB2, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}},  \
-  {.msg = {{ 0x2C1, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}}, \
+  {.msg = {{ 0x2C1, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 31U}, { 0 }, { 0 }}}, \
+  {.msg = {{ 0x280, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 31U}, { 0 }, { 0 }}}, \
    
 
 #define LEXUS_LS_STEERING_BUS_RX_CHECKS(lta)                                                                                               \
@@ -168,6 +169,15 @@ static void toyota_rx_hook(const CANPacket_t *to_push)
           gas_pressed = ( (GET_BYTE(to_push, 6) << 8) | (GET_BYTE(to_push, 7)) ) > 1000; //pedal is really sensitive
       }
    }
+   else if (GET_BUS(to_push) == 2U) 
+   {
+    int addr = GET_ADDR(to_push);
+    if (addr == 0x280) 
+    {
+      bool cruise_engaged = GET_BIT(to_push, 34U);  // PCM_CRUISE.CRUISE_ACTIVE
+      pcm_cruise_check(cruise_engaged);
+    }
+   }
   }
     
   if (GET_BUS(to_push) == 1U) 
@@ -179,6 +189,8 @@ static void toyota_rx_hook(const CANPacket_t *to_push)
       pcm_cruise_check(cruise_engaged);
     }
   }
+
+
 
 
 
@@ -372,13 +384,13 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
   }
 
   // UDS: Only tester present ("\x0F\x02\x3E\x00\x00\x00\x00\x00") allowed on diagnostics address
-  if (addr == 0x750) {
-    // this address is sub-addressed. only allow tester present to radar (0xF)
-    bool invalid_uds_msg = (GET_BYTES(to_send, 0, 4) != 0x003E020FU) || (GET_BYTES(to_send, 4, 4) != 0x0U);
-    if (invalid_uds_msg) {
-      tx = 0;
-    }
-  }
+  // if (addr == 0x750) {
+  //   // this address is sub-addressed. only allow tester present to radar (0xF)
+  //   bool invalid_uds_msg = (GET_BYTES(to_send, 0, 4) != 0x003E020FU) || (GET_BYTES(to_send, 4, 4) != 0x0U);
+  //   if (invalid_uds_msg) {
+  //     tx = 0;
+  //   }
+  // }
 
   return tx;
 }
