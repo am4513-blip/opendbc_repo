@@ -71,7 +71,9 @@ bool steer_torque_cmd_checks(int desired_torque, int steer_req, const TorqueStee
     }
 
     // *** global torque limit check ***
+    print("vlt_bfr "); puth4(violation);
     violation |= max_limit_check(desired_torque, max_torque, -max_torque);
+    print("vlt_aft "); puth4(violation);
 
     // *** torque rate limit check ***
     if (limits.type == TorqueDriverLimited) {

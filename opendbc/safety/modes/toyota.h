@@ -382,7 +382,7 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
       // When using LTA (angle control), assert no actuation on LKA message
       if (!toyota_lta) {
         if (steer_torque_cmd_checks(desired_torque, steer_req, TOYOTA_TORQUE_STEERING_LIMITS)) {
-          tx = true;
+          tx = false;
         }
       } else {
         if ((desired_torque != 0) || steer_req) {
