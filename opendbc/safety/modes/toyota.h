@@ -144,7 +144,7 @@ static void toyota_rx_hook(const CANPacket_t *to_push)
       if (addr == 0x224) //toyota_alt_brake &&
       {
         brake_pressed = GET_BIT(to_push, 5U);  // BRAKE_MODULE.BRAKE_PRESSED (toyota_new_mc_pt_generated.dbc)
-        print("brk_prsd: %x",brake_pressed ); print("\n");
+        print("brk_prsd: "); puth4(brake_pressed); print("\n");
       }
     }
     if (GET_BUS(to_push) == 1U) 
