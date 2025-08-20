@@ -114,8 +114,6 @@ class CarController(CarControllerBase):
     # >100 degree/sec steering fault prevention
     self.steer_rate_counter, apply_steer_req = common_fault_avoidance(abs(CS.out.steeringRateDeg) >= MAX_STEER_RATE, lat_active,
                                                                       self.steer_rate_counter, MAX_STEER_RATE_FRAMES)
-    print(lat_active)
-    print(apply_steer_req)
     if not lat_active:
       apply_torque = 0
 
