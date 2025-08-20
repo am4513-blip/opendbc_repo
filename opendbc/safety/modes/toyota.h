@@ -103,7 +103,9 @@ static bool toyota_get_quality_flag_valid(const CANPacket_t *to_push) {
 }
 
 static void toyota_rx_hook(const CANPacket_t *to_push) 
-{
+{ 
+  print("steering_bus: %x",lexus_ls_steering_bus_panda);
+  print("driving_bus: %x",lexus_ls_driving_bus_panda );
   if (lexus_ls_steering_bus_panda) //Internal Panda inside C3X
   {
     if (GET_BUS(to_push) == 0U) 
@@ -142,6 +144,7 @@ static void toyota_rx_hook(const CANPacket_t *to_push)
       if (addr == 0x224) //toyota_alt_brake &&
       {
         brake_pressed = GET_BIT(to_push, 5U);  // BRAKE_MODULE.BRAKE_PRESSED (toyota_new_mc_pt_generated.dbc)
+        print("brk_prsd: %x",brake_pressed );
       }
     }
     if (GET_BUS(to_push) == 1U) 
@@ -380,7 +383,6 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
       bool steer_req = GET_BIT(to_send, 0U);
       // When using LTA (angle control), assert no actuation on LKA message
       if (!toyota_lta) {
-        print("not_lta");
         if (steer_torque_cmd_checks(desired_torque, steer_req, TOYOTA_TORQUE_STEERING_LIMITS)) {
           tx = false;
         }
