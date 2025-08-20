@@ -372,7 +372,21 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
     }
 
     // STEER: safety check on bytes 2-3
-    if ( (addr == 0x180) && (lexus_ls_steering_bus_panda) ) {
+    if ( (addr == 0x180) && (lexus_ls_steering_bus_panda) ) 
+    {
+      uint8_t dat[8] = {0};
+      dat[0] = (addr >> 8) & 0xFF;
+      dat[1] = addr & 0xFF;
+      dat[2] = (uint8_t)lexus_ls_steering_bus_panda;
+      dat[3] = (GET_BYTE(to_send, 1) << 8);
+      dat[4] = GET_BYTE(to_send, 2);
+      dat[5] = (uint8_t)(GET_BIT(to_send, 0U));
+      CANPacket_t debug_pkt;
+      debug_pkt.addr = 0x777;    // some unused ID
+      debug_pkt.bus = 0;
+      debug_pkt.data_len_code = 8;
+      memcpy(debug_pkt.data, dat, 8);
+      can_send(&debug_pkt, 0);   // send it out so OP can log it
       int desired_torque = (GET_BYTE(to_send, 1) << 8) | GET_BYTE(to_send, 2);
       desired_torque = to_signed(desired_torque, 16);
       bool steer_req = GET_BIT(to_send, 0U);
