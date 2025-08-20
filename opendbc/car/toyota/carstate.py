@@ -70,7 +70,7 @@ class CarState(CarStateBase):
     ret.parkingBrake = cp_cam.vl["BODY_CONTROL_STATE"]["PARKING_BRAKE"] == 1
 
     ret.brakePressed = cp.vl["BRAKE_MODULE"]["BRAKE_PRESSED"] != 0
-    ret.brakeHoldActive = cp_body.vl["ESP_CONTROL"]["BRAKE_HOLD_ACTIVE"] == 1  
+    ret.brakeHoldActive = False  #cp_body.vl["ESP_CONTROL"]["BRAKE_HOLD_ACTIVE"] == 1  
 
     if self.CP.flags & ToyotaFlags.SECOC.value:
       self.secoc_synchronization = copy.copy(cp.vl["SECOC_SYNCHRONIZATION"])
@@ -191,7 +191,7 @@ class CarState(CarStateBase):
     #ret.cruiseState.nonAdaptive = self.pcm_acc_status in (1, 2, 3, 4, 5, 6)
 
     ret.genericToggle = bool(cp_cam.vl["LIGHT_STALK"]["AUTO_HIGH_BEAM"])
-    ret.espDisabled = cp_body.vl["ESP_CONTROL"]["TC_DISABLED"] != 0
+    ret.espDisabled = False #cp_body.vl["ESP_CONTROL"]["TC_DISABLED"] != 0
 
     if self.CP.enableBsm:
       ret.leftBlindspot = (cp.vl["BSM"]["L_ADJACENT"] == 1) or (cp.vl["BSM"]["L_APPROACHING"] == 1)
@@ -302,8 +302,8 @@ class CarState(CarStateBase):
     
     body_messages = []
     if CP.carFingerprint == CAR.LEXUS_LS:
-      body_messages += [  ("ESP_CONTROL", 3),  #3B7 on Body BUS
-                          ("PCM_CRUISE", 1),]  #689 on Body BUS
+      body_messages += [ ("PCM_CRUISE", 1),] # ("ESP_CONTROL", 3)3B7 on Body BUS
+                            #689 on Body BUS
 
     return {
       Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], pt_messages, 0),
