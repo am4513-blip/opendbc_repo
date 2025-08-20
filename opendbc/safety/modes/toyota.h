@@ -1,7 +1,6 @@
 #pragma once
 
 #include "opendbc/safety/safety_declarations.h"
-#include "can_common.h"
 
 #define LEXUS_LS_STEERING_TX_MSGS     \
   {0x180, 0, 5, .check_relay = true}, \
