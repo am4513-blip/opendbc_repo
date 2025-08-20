@@ -104,8 +104,10 @@ static bool toyota_get_quality_flag_valid(const CANPacket_t *to_push) {
 
 static void toyota_rx_hook(const CANPacket_t *to_push) 
 { 
+  int addr1 = GET_ADDR(to_push);
   print("steering_bus: "); puth4(lexus_ls_steering_bus_panda); print("\n");
   print("driving_bus: "); puth4(lexus_ls_driving_bus_panda); print("\n");
+  print("CAN_Addr: "); puth4(addr1); print("\n");
   if (lexus_ls_steering_bus_panda) //Internal Panda inside C3X
   {
     if (GET_BUS(to_push) == 0U) 
@@ -153,6 +155,7 @@ static void toyota_rx_hook(const CANPacket_t *to_push)
      if (addr == 0x689) 
      {
        bool cruise_engaged = GET_BIT(to_push, 17U);  // PCM_CRUISE.CRUISE_ACTIVE
+       print("crs_eng: "); puth4(cruise_engaged); print("\n");
        pcm_cruise_check(cruise_engaged);
      }
    }
