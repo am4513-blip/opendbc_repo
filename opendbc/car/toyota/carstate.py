@@ -154,6 +154,7 @@ class CarState(CarStateBase):
       ret.cruiseState.available = cp_body.vl["PCM_CRUISE"]["RADAR_READY"] != 0 #############################################
       ret.cruiseState.speed = cp_body.vl["PCM_CRUISE"]["UI_SET_SPEED"] #cp.vl["DSU_CRUISE"]["SET_SPEED"] * CV.KPH_TO_MS
       cluster_set_speed = cp_body.vl["PCM_CRUISE"]["UI_SET_SPEED"] #cp.vl["PCM_CRUISE_ALT"]["UI_SET_SPEED"]
+      ret.accFaulted = cp_cam.vl["VSC_DATA7"]["BRK_ERR_FLGS"] != 0
     else:
       ret.accFaulted = cp_cam.vl["VSC_DATA7"]["BRK_ERR_FLGS"] != 0 #cp.vl["PCM_CRUISE_2"]["ACC_FAULTED"] != 0 #######################
       #ret.carFaultedNonCritical = cp.vl["PCM_CRUISE_SM"]["TEMP_ACC_FAULTED"] != 0
@@ -163,7 +164,7 @@ class CarState(CarStateBase):
 
     # UI_SET_SPEED is always non-zero when main is on, hide until first enable
     if ret.cruiseState.speed != 0:
-      is_metric = cp.vl["BODY_CONTROL_STATE_2"]["UNITS"] in (1, 2)
+      is_metric = cp_cam.vl["BODY_CONTROL_STATE_2"]["UNITS"] in (1, 2)
       conversion_factor = CV.KPH_TO_MS if is_metric else CV.MPH_TO_MS
       ret.cruiseState.speedCluster = cluster_set_speed * conversion_factor
 
