@@ -64,11 +64,11 @@ class CarState(CarStateBase):
     self.secoc_synchronization = None
 
   def update(self, can_parsers) -> structs.CarState:
-    cp_str = can_parsers[Bus.pt]
-    cp_drv = can_parsers[Bus.cam]
-    cp_body = can_parsers[Bus.body]
-    cp_dsu_drv = can_parsers[Bus.dsu_drv]
-    cp_alt = can_parsers[Bus.alt]
+    cp_str = can_parsers[Bus.pt]  # Steering BUS (Vehicle Side)
+    cp_drv = can_parsers[Bus.cam] # Driving BUS (Vehicle Side)
+    cp_body = can_parsers[Bus.body]  # Body BUS (Vehicle Side)
+    cp_dsu_drv = can_parsers[Bus.dsu_drv] # Driving BUS (DSU Side)
+    cp_alt = can_parsers[Bus.alt]  # CAN1 of PANDA
 
     ret = structs.CarState()
     #cp_acc = cp_cam if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR) else cp
@@ -79,7 +79,7 @@ class CarState(CarStateBase):
     ret.doorOpen = any([cp_drv.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FL"], cp_drv.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FR"],
                         cp_drv.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_RL"], cp_drv.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_RR"]])
     ret.seatbeltUnlatched = cp_drv.vl["BODY_CONTROL_STATE"]["SEATBELT_DRIVER_UNLATCHED"] != 0
-    ret.parkingBrake = cp_body.vl["BODY_CONTROL_STATE"]["PARKING_BRAKE"] == 1
+    ret.parkingBrake = cp_drv.vl["BODY_CONTROL_STATE"]["PARKING_BRAKE"] == 1
 
     ret.brakePressed = cp_str.vl["BRAKE_MODULE"]["BRAKE_PRESSED"] != 0 
     ret.brakeHoldActive = cp_body.vl["ESP_CONTROL"]["BRAKE_HOLD_ACTIVE"] == 1
@@ -349,7 +349,7 @@ class CarState(CarStateBase):
     acc_messages = [("PCM_CRUISE", 1), ]            #0x689 
 
     return {
-      Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], str_messages, 0),
+      Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], str_messages, 0),  # Steering BUS (Vehicle Side)
       Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], drv_messages, 4),
       Bus.body: CANParser(DBC[CP.carFingerprint][Bus.pt], body_messages, 8),
       Bus.dsu_drv: CANParser(DBC[CP.carFingerprint][Bus.pt], dsu_drv_messages, 6),
