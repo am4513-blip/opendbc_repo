@@ -348,9 +348,10 @@ class CarState(CarStateBase):
     acc_messages = [("PCM_CRUISE", 1), ]            #0x689 
 
     return {
-      Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], str_messages, 0),
-      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.drv], drv_messages, 4),
-      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.alt], acc_messages, 1),
-      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.body], body_messages, 8),
-      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.dsu_drv], dsu_drv_messages, 6),
+      Bus.str: CANParser(DBC[CP.carFingerprint][Bus.pt], str_messages, 0),
+      Bus.alt: CANParser(DBC[CP.carFingerprint][Bus.alt], acc_messages, 1),
+      Bus.drv: CANParser(DBC[CP.carFingerprint][Bus.drv], drv_messages, 4),
+      Bus.dsu_drv: CANParser(DBC[CP.carFingerprint][Bus.dsu_drv], dsu_drv_messages, 6),
+      Bus.body: CANParser(DBC[CP.carFingerprint][Bus.body], body_messages, 8),
+      
     }
