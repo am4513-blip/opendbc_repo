@@ -8,6 +8,9 @@
 #define LEXUS_LS_DRIVING_TX_MSGS      \
   {0x280, 0, 8, .check_relay = true}, \
 
+#define LEXUS_LS_BODY_TX_MSGS      \
+  {0x689, 0, 8, .check_relay = true}, \
+
 // Stock longitudinal
 #define TOYOTA_BASE_TX_MSGS \
   {0x191, 0, 8, .check_relay = true}, {0x412, 0, 8, .check_relay = true}, {0x1D2, 0, 8, .check_relay = false},  /* LKAS + LTA + PCM cancel cmd */  \
@@ -414,6 +417,10 @@ static safety_config toyota_init(uint16_t param) {
 
   static const CanMsg LEXUS_LS_LAT_TX_MSGS[] = {
     LEXUS_LS_STEERING_TX_MSGS
+  };
+
+  static const CanMsg LEXUS_LS_BODY_TX_MSGS[] = {
+    LEXUS_LS_BODY_TX_MSGS
   };
 
 
