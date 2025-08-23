@@ -96,7 +96,7 @@ class CarState(CarStateBase):
       # if not self.CP.enableDsu and not self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
       #   ret.stockAeb = bool(cp_acc.vl["PRE_COLLISION"]["PRECOLLISION_ACTIVE"] and cp_acc.vl["PRE_COLLISION"]["FORCE"] < -1e-5)
       if self.CP.carFingerprint != CAR.TOYOTA_MIRAI:
-        ret.engineRpm = cp_drv.vl["ENGINE_RPM"]["RPM"]            ############### LEXUS_LS ###############################
+        ret.engineRpm = 1000 #cp_drv.vl["ENGINE_RPM"]["RPM"]            ############### LEXUS_LS ###############################
 
     # ret.wheelSpeeds = self.get_wheel_speeds(
     #   cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_FL"],
