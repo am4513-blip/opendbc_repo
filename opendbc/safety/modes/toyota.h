@@ -416,6 +416,8 @@ static safety_config toyota_init(uint16_t param) {
     LEXUS_LS_STEERING_TX_MSGS
   };
 
+
+
   // safety param flags
   // first byte is for EPS factor, second is for flags
   const uint32_t TOYOTA_PARAM_OFFSET = 8U;
@@ -440,7 +442,7 @@ static safety_config toyota_init(uint16_t param) {
 
   lexus_ls_steering_bus_panda = GET_FLAG(param, LEXUS_LS_PARAM_STEERING_BUS_PANDA);
   lexus_ls_driving_bus_panda = GET_FLAG(param, LEXUS_LS_PARAM_DRIVING_BUS_PANDA);
-  lexu
+  lexus_ls_body_bus_panda = GET_FLAG(param, LEXUS_LS_PARAM_BODY_BUS_PANDA);
 
   safety_config ret;
 
