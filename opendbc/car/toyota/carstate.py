@@ -96,7 +96,7 @@ class CarState(CarStateBase):
       # if not self.CP.enableDsu and not self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
       #   ret.stockAeb = bool(cp_acc.vl["PRE_COLLISION"]["PRECOLLISION_ACTIVE"] and cp_acc.vl["PRE_COLLISION"]["FORCE"] < -1e-5)
       if self.CP.carFingerprint != CAR.TOYOTA_MIRAI:
-        ret.engineRpm = 1000 #cp_drv.vl["ENGINE_RPM"]["RPM"]            ############### LEXUS_LS ###############################
+        ret.engineRpm = cp_drv.vl["ENGINE_RPM"]["RPM"]            ############### LEXUS_LS ###############################
 
     # ret.wheelSpeeds = self.get_wheel_speeds(
     #   cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_FL"],
@@ -255,8 +255,8 @@ class CarState(CarStateBase):
       ret.leftBlindspot = (cp.vl["BSM"]["L_ADJACENT"] == 1) or (cp.vl["BSM"]["L_APPROACHING"] == 1)
       ret.rightBlindspot = (cp.vl["BSM"]["R_ADJACENT"] == 1) or (cp.vl["BSM"]["R_APPROACHING"] == 1)
 
-    if self.CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
-      self.lkas_hud = copy.copy(cp_cam.vl["LKAS_HUD"])
+    # if self.CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
+    #   self.lkas_hud = copy.copy(cp_cam.vl["LKAS_HUD"])
 
     if self.CP.carFingerprint not in UNSUPPORTED_DSU_CAR:
       self.pcm_follow_distance = 1 #cp_body.vl["PCM_CRUISE_2"]["PCM_FOLLOW_DISTANCE"]
