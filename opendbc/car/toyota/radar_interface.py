@@ -75,7 +75,7 @@ class RadarInterface(RadarInterfaceBase):
         else:
           self.valid_cnt[ii] = max(self.valid_cnt[ii] - 1, 0)
 
-        score = self.rcp.vl[ii+16]['SCORE']
+        #score = self.rcp.vl[ii+16]['SCORE']
         # print ii, self.valid_cnt[ii], score, cpt['VALID'], cpt['LONG_DIST'], cpt['LAT_DIST']
         
         #Lexus_LS uses different radar messages. SCORE message contains the SCORE signal for two different radar track points
