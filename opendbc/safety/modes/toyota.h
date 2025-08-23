@@ -384,6 +384,11 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
         }
       }
     }
+
+    if ( (addr == 0x689) && (lexus_ls_body_bus_panda) )
+    {
+      tx = true;
+    }
   }
 
   // UDS: Only tester present ("\x0F\x02\x3E\x00\x00\x00\x00\x00") allowed on diagnostics address
