@@ -64,7 +64,7 @@ class CarState(CarStateBase):
     self.secoc_synchronization = None
 
   def update(self, can_parsers) -> structs.CarState:
-    cp_str = can_parsers[Bus.str]
+    cp_str = can_parsers[Bus.pt]
     cp_drv = can_parsers[Bus.drv]
     cp_body = can_parsers[Bus.body]
     cp_dsu_drv = can_parsers[Bus.dsu_drv]
@@ -348,7 +348,7 @@ class CarState(CarStateBase):
     acc_messages = [("PCM_CRUISE", 1), ]            #0x689 
 
     return {
-      Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.str], str_messages, 0),
+      Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], str_messages, 0),
       Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.drv], drv_messages, 4),
       Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.alt], acc_messages, 1),
       Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.body], body_messages, 8),
