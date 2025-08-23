@@ -3,7 +3,7 @@ from opendbc.car.toyota.carstate import CarState
 from opendbc.car.toyota.carcontroller import CarController
 from opendbc.car.toyota.radar_interface import RadarInterface
 from opendbc.car.toyota.values import Ecu, CAR, DBC, ToyotaFlags, CarControllerParams, TSS2_CAR, RADAR_ACC_CAR, NO_DSU_CAR, \
-                                                  MIN_ACC_SPEED, EPS_SCALE, UNSUPPORTED_DSU_CAR, NO_STOP_TIMER_CAR, ANGLE_CONTROL_CAR, \
+                                                  MIN_ACC_SPEED, EPS_SCALE, UNSUPPORTED_DSU_CAR,                                     m, ANGLE_CONTROL_CAR, \
                                                   ToyotaSafetyFlags
 from opendbc.car.disable_ecu import disable_ecu
 from opendbc.car.interfaces import CarInterfaceBase
@@ -23,11 +23,17 @@ class CarInterface(CarInterfaceBase):
   @staticmethod
   def _get_params(ret: structs.CarParams, candidate, fingerprint, car_fw, alpha_long, is_release, docs) -> structs.CarParams:
     ret.brand = "toyota"
-    ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.toyota)]
+    if(CAR.LEXUS_LS):
+      ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.toyota, ToyotaSafetyFlags.LEXUS_LS_STEERING_BUS_PANDA.value)]
+      ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.toyota, ToyotaSafetyFlags.LEXUS_LS_DRIVING_BUS_PANDA.value)]
+      ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.toyota, ToyotaSafetyFlags.LEXUS_LS_BODY_BUS_PANDA.value)]
+    else:
+      ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.toyota)]
+      
     ret.safetyConfigs[0].safetyParam = EPS_SCALE[candidate]
 
     # BRAKE_MODULE is on a different address for these cars
-    if DBC[candidate][Bus.pt] == "toyota_new_mc_pt_generated":
+    if DBC[candidate][Bus.pt] in ["toyota_new_mc_pt_generated", "lexus_ls_new_mc_pt_generated"]:
       ret.safetyConfigs[0].safetyParam |= ToyotaSafetyFlags.ALT_BRAKE.value
 
     if ret.flags & ToyotaFlags.SECOC.value:
@@ -94,7 +100,11 @@ class CarInterface(CarInterfaceBase):
     elif candidate in (CAR.TOYOTA_CHR, CAR.TOYOTA_CAMRY, CAR.TOYOTA_SIENNA, CAR.LEXUS_CTH, CAR.LEXUS_NX):
       # TODO: Some of these platforms are not advertised to have full range ACC, are they similar to SNG_WITHOUT_DSU cars?
       stop_and_go = True
-
+      
+    elif candidate in (CAR.LEXUS_LS):
+      stop_and_go = True
+      ret.openpilotLongitudinalControl = True
+      
     # TODO: these models can do stop and go, but unclear if it requires sDSU or unplugging DSU.
     #  For now, don't list stop and go functionality in the docs
     if ret.flags & ToyotaFlags.SNG_WITHOUT_DSU:

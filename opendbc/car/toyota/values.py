@@ -16,7 +16,7 @@ PEDAL_TRANSITION = 10. * CV.MPH_TO_MS
 
 class CarControllerParams:
   STEER_STEP = 1
-  STEER_MAX = 1500
+  STEER_MAX = 1100  ########### LEXUS_LS ################
   STEER_ERROR_MAX = 350     # max delta between torque cmd and torque motor
 
   # Lane Tracing Assist (LTA) control limits
@@ -42,7 +42,7 @@ class CarControllerParams:
     self.ACCEL_MIN = -3.5  # m/s2
 
     if CP.lateralTuning.which() == 'torque':
-      self.STEER_DELTA_UP = 15       # 1.0s time to peak torque
+      self.STEER_DELTA_UP = 10       # 1.0s time to peak torque
       self.STEER_DELTA_DOWN = 25     # always lower than 45 otherwise the Rav4 faults (Prius seems ok with 50)
     else:
       self.STEER_DELTA_UP = 10       # 1.5s time to peak torque
@@ -56,6 +56,10 @@ class ToyotaSafetyFlags(IntFlag):
   LTA = (4 << 8)
   SECOC = (8 << 8)
 
+  # Lexus LS Safety Flags for multiple Pandas
+  LEXUS_LS_STEERING_BUS_PANDA = (16 << 8) #First Panda (internal inside C3X)
+  LEXUS_LS_DRIVING_BUS_PANDA =  (32 << 8) #Second Panda (external)
+  LEXUS_LS_BODY_BUS_PANDA =     (64 << 8) #Third Panda (external)
 
 class ToyotaFlags(IntFlag):
   # Detected flags
@@ -394,6 +398,12 @@ class CAR(Platforms):
     dbc_dict('toyota_new_mc_pt_generated', 'toyota_adas'),
     flags=ToyotaFlags.UNSUPPORTED_DSU,
   )
+  LEXUS_LS = PlatformConfig(
+    [ToyotaCarDocs("Lexus GS F 2016")],
+    CarSpecs(mass=4250. * CV.LB_TO_KG, wheelbase=3.09, steerRatio=15.0, tireStiffnessFactor=0.55),
+    dbc_dict('lexus_ls_new_mc_pt_generated', 'lexus_ls_adas'),
+    flags=ToyotaFlags.NO_STOP_TIMER | ToyotaFlags.SNG_WITHOUT_DSU | ToyotaFlags.NO_STOP_TIMER | ToyotaFlags.RAISED_ACCEL_LIMIT
+  )
 
 
 # (addr, cars, bus, 1/freq*100, vl)
@@ -611,7 +621,7 @@ STEER_THRESHOLD = 100
 
 # These cars have non-standard EPS torque scale factors. All others are 73
 EPS_SCALE = defaultdict(lambda: 73,
-                        {CAR.TOYOTA_PRIUS: 66, CAR.TOYOTA_COROLLA: 88, CAR.LEXUS_IS: 77, CAR.LEXUS_RC: 77, CAR.LEXUS_CTH: 100, CAR.TOYOTA_PRIUS_V: 100})
+                        {CAR.TOYOTA_PRIUS: 66, CAR.TOYOTA_COROLLA: 88, CAR.LEXUS_IS: 77, CAR.LEXUS_RC: 77, CAR.LEXUS_CTH: 100, CAR.TOYOTA_PRIUS_V: 100, CAR.LEXUS_LS:180})
 
 # Toyota/Lexus Safety Sense 2.0 and 2.5
 TSS2_CAR = CAR.with_flags(ToyotaFlags.TSS2)
