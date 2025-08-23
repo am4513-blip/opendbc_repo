@@ -68,6 +68,7 @@ class CarState(CarStateBase):
     cp_drv = can_parsers[Bus.drv]
     cp_body = can_parsers[Bus.body]
     cp_dsu_drv = can_parsers[Bus.dsu_drv]
+    cp_alt = can_parsers[Bus.alt]
 
     ret = structs.CarState()
     #cp_acc = cp_cam if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR) else cp
@@ -166,11 +167,11 @@ class CarState(CarStateBase):
       ret.accFaulted = cp_drv.vl["VSC_DATA7"]["BRK_ERR_FLGS"] != 0                    ############### LEXUS_LS ########################
       #ret.carFaultedNonCritical = cp.vl["PCM_CRUISE_SM"]["TEMP_ACC_FAULTED"] != 0
       #ret.cruiseState.available = cp.vl["PCM_CRUISE_2"]["MAIN_ON"] != 0
-      ret.cruiseState.available = cp_body.vl["PCM_CRUISE"]["RADAR_READY"] != 0        ############### LEXUS_LS ########################
+      ret.cruiseState.available = cp_alt.vl["PCM_CRUISE"]["RADAR_READY"] != 0        ############### LEXUS_LS ########################
       #ret.cruiseState.speed = cp.vl["PCM_CRUISE_2"]["SET_SPEED"] * CV.KPH_TO_MS
-      ret.cruiseState.speed = cp_body.vl["PCM_CRUISE"]["UI_SET_SPEED"] * CV.MPH_TO_MS ############### LEXUS_LS ########################
+      ret.cruiseState.speed = cp_alt.vl["PCM_CRUISE"]["UI_SET_SPEED"] * CV.MPH_TO_MS ############### LEXUS_LS ########################
       #cluster_set_speed = cp.vl["PCM_CRUISE_SM"]["UI_SET_SPEED"]
-      cluster_set_speed = cp_body.vl["PCM_CRUISE"]["UI_SET_SPEED"]                    ############### LEXUS_LS ########################
+      cluster_set_speed = cp_alt.vl["PCM_CRUISE"]["UI_SET_SPEED"]                    ############### LEXUS_LS ########################
       
 
       
@@ -244,7 +245,7 @@ class CarState(CarStateBase):
     if self.CP.carFingerprint not in (NO_STOP_TIMER_CAR - TSS2_CAR):
       # ignore standstill state in certain vehicles, since pcm allows to restart with just an acceleration request
       ret.cruiseState.standstill = self.pcm_acc_status == 7
-    ret.cruiseState.enabled = bool(cp_body.vl["PCM_CRUISE"]["CRUISE_ACTIVE"])
+    ret.cruiseState.enabled = bool(cp_alt.vl["PCM_CRUISE"]["CRUISE_ACTIVE"])
     ret.cruiseState.nonAdaptive = self.pcm_acc_status in (1, 2, 3, 4, 5, 6)
 
     ret.genericToggle = bool(cp_drv.vl["LIGHT_STALK"]["AUTO_HIGH_BEAM"])
@@ -349,7 +350,7 @@ class CarState(CarStateBase):
 
     return {
       Bus.str: CANParser(DBC[CP.carFingerprint][Bus.pt], str_messages, 0),
-      Bus.alt: CANParser(DBC[CP.carFingerprint][Bus.alt], acc_messages, 1),
+      Bus.alt: CANParser(DBC[CP.carFingerprint][Bus.alt], acc_messages, 9),
       Bus.drv: CANParser(DBC[CP.carFingerprint][Bus.drv], drv_messages, 4),
       Bus.dsu_drv: CANParser(DBC[CP.carFingerprint][Bus.dsu_drv], dsu_drv_messages, 6),
       Bus.body: CANParser(DBC[CP.carFingerprint][Bus.body], body_messages, 8),
