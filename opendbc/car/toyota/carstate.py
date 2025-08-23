@@ -68,7 +68,7 @@ class CarState(CarStateBase):
     cp_drv = can_parsers[Bus.drv]
     cp_body = can_parsers[Bus.body]
     cp_dsu_drv = can_parsers[Bus.dsu_drv]
-    cp_alt = can_parsers[Bus.alt]
+    cp_alt = can_parsers[Bus.cam]
 
     ret = structs.CarState()
     #cp_acc = cp_cam if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR) else cp
@@ -350,9 +350,9 @@ class CarState(CarStateBase):
 
     return {
       Bus.str: CANParser(DBC[CP.carFingerprint][Bus.pt], str_messages, 0),
-      Bus.alt: CANParser(DBC[CP.carFingerprint][Bus.alt], acc_messages, 9),
       Bus.drv: CANParser(DBC[CP.carFingerprint][Bus.drv], drv_messages, 4),
       Bus.dsu_drv: CANParser(DBC[CP.carFingerprint][Bus.dsu_drv], dsu_drv_messages, 6),
       Bus.body: CANParser(DBC[CP.carFingerprint][Bus.body], body_messages, 8),
+      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.cam], acc_messages, 1),
       
     }
