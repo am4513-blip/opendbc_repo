@@ -64,11 +64,11 @@ class CarState(CarStateBase):
     self.secoc_synchronization = None
 
   def update(self, can_parsers) -> structs.CarState:
-    cp_str = can_parsers[Bus.pt]
+    cp_str = can_parsers[Bus.str]
     cp_drv = can_parsers[Bus.drv]
     cp_body = can_parsers[Bus.body]
     cp_dsu_drv = can_parsers[Bus.dsu_drv]
-    cp_alt = can_parsers[Bus.cam]
+    cp_alt = can_parsers[Bus.alt]
 
     ret = structs.CarState()
     #cp_acc = cp_cam if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR) else cp
@@ -350,9 +350,9 @@ class CarState(CarStateBase):
 
     return {
       Bus.str: CANParser(DBC[CP.carFingerprint][Bus.pt], str_messages, 0),
-      Bus.drv: CANParser(DBC[CP.carFingerprint][Bus.drv], drv_messages, 4),
-      Bus.dsu_drv: CANParser(DBC[CP.carFingerprint][Bus.dsu_drv], dsu_drv_messages, 6),
-      Bus.body: CANParser(DBC[CP.carFingerprint][Bus.body], body_messages, 8),
-      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.cam], acc_messages, 1),
+      Bus.drv: CANParser(DBC[CP.carFingerprint][Bus.pt], drv_messages, 4),
+      Bus.dsu_drv: CANParser(DBC[CP.carFingerprint][Bus.pt], dsu_drv_messages, 6),
+      Bus.body: CANParser(DBC[CP.carFingerprint][Bus.pt], body_messages, 8),
+      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], acc_messages, 1),
       
     }
