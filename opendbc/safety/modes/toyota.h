@@ -424,7 +424,7 @@ static safety_config toyota_init(uint16_t param) {
     LEXUS_LS_STEERING_TX_MSGS
   };
 
-  static const CanMsg LEXUS_LS_BODY_TX_MSGS[] = {
+  static const CanMsg LEXUS_LS_ACC_TX_MSGS[] = {
     LEXUS_LS_BODY_TX_MSGS
   };
 
@@ -469,7 +469,7 @@ static safety_config toyota_init(uint16_t param) {
   }
   else if(lexus_ls_body_bus_panda)
   {
-    SET_TX_MSGS(LEXUS_LS_BODY_TX_MSGS, ret);
+    SET_TX_MSGS(LEXUS_LS_ACC_TX_MSGS, ret);
   }
 
   // if (toyota_stock_longitudinal) 
