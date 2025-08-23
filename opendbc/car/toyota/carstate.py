@@ -93,8 +93,8 @@ class CarState(CarStateBase):
       #ret.gasPressed = cp.vl["PCM_CRUISE"]["GAS_RELEASED"] == 0  # TODO: these also have GAS_PEDAL, come back and unify
       ret.gasPressed = cp_drv.vl["GAS_PEDAL"]["GAS_PEDAL"] > 1000 ############### LEXUS_LS ###############################
       can_gear = int(cp_drv.vl["GEAR_PACKET"]["GEAR"])            ############### LEXUS_LS ###############################
-      if not self.CP.enableDsu and not self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
-        ret.stockAeb = bool(cp_acc.vl["PRE_COLLISION"]["PRECOLLISION_ACTIVE"] and cp_acc.vl["PRE_COLLISION"]["FORCE"] < -1e-5)
+      # if not self.CP.enableDsu and not self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
+      #   ret.stockAeb = bool(cp_acc.vl["PRE_COLLISION"]["PRECOLLISION_ACTIVE"] and cp_acc.vl["PRE_COLLISION"]["FORCE"] < -1e-5)
       if self.CP.carFingerprint != CAR.TOYOTA_MIRAI:
         ret.engineRpm = cp_drv.vl["ENGINE_RPM"]["RPM"]            ############### LEXUS_LS ###############################
 
