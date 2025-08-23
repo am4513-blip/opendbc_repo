@@ -257,15 +257,15 @@ class CarState(CarStateBase):
     if self.CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
       self.lkas_hud = copy.copy(cp_cam.vl["LKAS_HUD"])
 
-    # if self.CP.carFingerprint not in UNSUPPORTED_DSU_CAR:
-    #   self.pcm_follow_distance = cp_body.vl["PCM_CRUISE_2"]["PCM_FOLLOW_DISTANCE"]
+    if self.CP.carFingerprint not in UNSUPPORTED_DSU_CAR:
+      self.pcm_follow_distance = 1 #cp_body.vl["PCM_CRUISE_2"]["PCM_FOLLOW_DISTANCE"]
 
-    # if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR):
-    #   # distance button is wired to the ACC module (camera or radar)
-    #   prev_distance_button = self.distance_button
-    #   self.distance_button = cp_acc.vl["ACC_CONTROL"]["DISTANCE"]
+    if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR):
+      # distance button is wired to the ACC module (camera or radar)
+      prev_distance_button = self.distance_button
+      self.distance_button = 1 #cp_acc.vl["ACC_CONTROL"]["DISTANCE"]
 
-    #   ret.buttonEvents = create_button_events(self.distance_button, prev_distance_button, {1: ButtonType.gapAdjustCruise})
+      ret.buttonEvents = create_button_events(self.distance_button, prev_distance_button, {1: ButtonType.gapAdjustCruise})
 
     return ret
 
@@ -348,9 +348,9 @@ class CarState(CarStateBase):
     acc_messages = [("PCM_CRUISE", 1), ]            #0x689 
 
     return {
-      Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], str_messages, 0),
-      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], drv_messages, 4),
-      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], acc_messages, 5),
-      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], body_messages, 8),
-      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], dsu_drv_messages, 6),
+      Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.str], str_messages, 0),
+      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.drv], drv_messages, 4),
+      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.alt], acc_messages, 1),
+      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.body], body_messages, 8),
+      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.dsu_drv], dsu_drv_messages, 6),
     }
