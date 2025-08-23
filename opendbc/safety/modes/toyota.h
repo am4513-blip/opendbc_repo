@@ -10,7 +10,6 @@
 
 #define LEXUS_LS_BODY_TX_MSGS         \
   {0x689, 0, 8, .check_relay = true}, \
-  
 
 // Stock longitudinal
 #define TOYOTA_BASE_TX_MSGS \
@@ -467,6 +466,10 @@ static safety_config toyota_init(uint16_t param) {
   else if(lexus_ls_driving_bus_panda)
   {
     SET_TX_MSGS(LEXUS_LS_LONG_TX_MSGS, ret);
+  }
+  else if(lexus_ls_body_bus_panda)
+  {
+    SET_TX_MSGS(LEXUS_LS_BODY_TX_MSGS, ret);
   }
 
   // if (toyota_stock_longitudinal) 
