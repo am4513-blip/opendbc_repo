@@ -64,7 +64,7 @@ class CarState(CarStateBase):
     self.secoc_synchronization = None
 
   def update(self, can_parsers) -> structs.CarState:
-    cp_str = can_parsers[Bus.str]
+    cp_str = can_parsers[Bus.pt]
     cp_drv = can_parsers[Bus.drv]
     cp_body = can_parsers[Bus.body]
     cp_dsu_drv = can_parsers[Bus.dsu_drv]
