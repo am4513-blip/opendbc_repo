@@ -23,12 +23,10 @@ class CarInterface(CarInterfaceBase):
   @staticmethod
   def _get_params(ret: structs.CarParams, candidate, fingerprint, car_fw, alpha_long, is_release, docs) -> structs.CarParams:
     ret.brand = "toyota"
-    if(CAR.LEXUS_LS):
-      ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.toyota, ToyotaSafetyFlags.LEXUS_LS_STEERING_BUS_PANDA.value)]
-      ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.toyota, ToyotaSafetyFlags.LEXUS_LS_DRIVING_BUS_PANDA.value)]
-      ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.toyota, ToyotaSafetyFlags.LEXUS_LS_BODY_BUS_PANDA.value)]
-    else:
-      ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.toyota)]
+    ret.safetyConfigs = [ get_safety_config(structs.CarParams.SafetyModel.toyota, ToyotaSafetyFlags.LEXUS_LS_STEERING_BUS_PANDA.value),
+                          get_safety_config(structs.CarParams.SafetyModel.toyota, ToyotaSafetyFlags.LEXUS_LS_DRIVING_BUS_PANDA.value),
+                          get_safety_config(structs.CarParams.SafetyModel.toyota, ToyotaSafetyFlags.LEXUS_LS_BODY_BUS_PANDA.value),]
+
       
     ret.safetyConfigs[0].safetyParam = EPS_SCALE[candidate]
 
