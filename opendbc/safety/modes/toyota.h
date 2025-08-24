@@ -45,11 +45,14 @@
   {.msg = {{ 0xB0, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}},  \
   {.msg = {{ 0xB2, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 83U}, { 0 }, { 0 }}},  \
   {.msg = {{ 0x2C1, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 31U}, { 0 }, { 0 }}}, \
-  {.msg = {{ 0x280, 2, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 31U}, { 0 }, { 0 }}}, \
+  {.msg = {{ 0x689, 1, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 1U}, { 0 }, { 0 }}}, \
 
 #define LEXUS_LS_STEERING_BUS_RX_CHECKS(lta)                                                                                               \
  {.msg = {{0x224, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 40U}, { 0 }, { 0 }}},   \
  {.msg = {{0x260, 0, 8, .ignore_counter = true, .ignore_quality_flag=!(lta), .frequency = 50U}, { 0 }, { 0 }}},                            \
+ {.msg = {{0x689, 1, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 1U}, { 0 }, { 0 }}},    \
+
+#define LEXUS_LS_BODY_BUS_RX_CHECKS(lta)                                                                                                   \
  {.msg = {{0x689, 1, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 1U}, { 0 }, { 0 }}},    \
 
 #define TOYOTA_COMMON_RX_CHECKS(lta)                                                                                                       \
@@ -521,6 +524,13 @@ static safety_config toyota_init(uint16_t param) {
   {
     static RxCheck lexus_ls_rx_checks[] = {
       LEXUS_LS_DRIVING_BUS_RX_CHECKS(false)
+    };
+    SET_RX_CHECKS(lexus_ls_rx_checks, ret);
+  }
+  else if(lexus_ls_body_bus_panda)
+  {
+    static RxCheck lexus_ls_rx_checks[] = {
+      LEXUS_LS_BODY_BUS_RX_CHECKS(false)
     };
     SET_RX_CHECKS(lexus_ls_rx_checks, ret);
   }
