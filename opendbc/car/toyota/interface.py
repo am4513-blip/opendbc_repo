@@ -99,10 +99,6 @@ class CarInterface(CarInterfaceBase):
       # TODO: Some of these platforms are not advertised to have full range ACC, are they similar to SNG_WITHOUT_DSU cars?
       stop_and_go = True
       
-    elif candidate in (CAR.LEXUS_LS):
-      stop_and_go = True
-      ret.openpilotLongitudinalControl = True
-      
     # TODO: these models can do stop and go, but unclear if it requires sDSU or unplugging DSU.
     #  For now, don't list stop and go functionality in the docs
     if ret.flags & ToyotaFlags.SNG_WITHOUT_DSU:
@@ -138,8 +134,10 @@ class CarInterface(CarInterfaceBase):
       ret.openpilotLongitudinalControl = ret.enableDsu or \
         candidate in (TSS2_CAR - RADAR_ACC_CAR) or \
         bool(ret.flags & ToyotaFlags.DISABLE_RADAR.value)
-
-    ret.autoResumeSng = ret.openpilotLongitudinalControl and candidate in NO_STOP_TIMER_CAR
+        
+    stop_and_go = True
+    ret.openpilotLongitudinalControl = True
+    ret.autoResumeSng = True #ret.openpilotLongitudinalControl and candidate in NO_STOP_TIMER_CAR
 
     if not ret.openpilotLongitudinalControl:
       ret.safetyConfigs[0].safetyParam |= ToyotaSafetyFlags.STOCK_LONGITUDINAL.value
