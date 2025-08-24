@@ -6,11 +6,11 @@
   {0x180, 0, 5, .check_relay = true}, \
 
 #define LEXUS_LS_DRIVING_TX_MSGS      \
-  {0x280, 0, 8, .check_relay = true}, \
+  {0x280, 0, 8, .check_relay = true}, \  //ACCEL MSG
   {0x790, 2, 8, .check_relay = true}, \
 
 #define LEXUS_LS_BODY_TX_MSGS         \
-  {0x689, 0, 8, .check_relay = true}, \
+  {0x689, 0, 8, .check_relay = true}, \  //CRUISE ACTIVE
 
 // Stock longitudinal
 #define TOYOTA_BASE_TX_MSGS \
@@ -114,8 +114,10 @@ static bool toyota_get_quality_flag_valid(const CANPacket_t *to_push) {
 static void toyota_rx_hook(const CANPacket_t *to_push) 
 { 
   int addr2 = GET_ADDR(to_push);
-  //print("steering_bus: "); puth4(lexus_ls_steering_bus_panda); print("\n");
+
+  print("steering_bus: "); puth4(lexus_ls_steering_bus_panda); print("\n");
   print("driving_bus: "); puth4(lexus_ls_driving_bus_panda); print("\n");
+  print("body_bus: "); puth4(lexus_ls_body_bus_panda); print("\n");
   print("addr: "); puth4(addr2); print("\n");
   if (lexus_ls_steering_bus_panda) //Internal Panda inside C3X
   {
@@ -195,6 +197,7 @@ static void toyota_rx_hook(const CANPacket_t *to_push)
      if (addr == 0x689) 
      {
        bool cruise_engaged = GET_BIT(to_push, 17U);  // PCM_CRUISE.CRUISE_ACTIVE
+       print("crs_eng: "); puth4(cruise_engaged); print("\n");
        pcm_cruise_check(cruise_engaged);
      }
    }
