@@ -298,7 +298,7 @@ class CarController(CarControllerBase):
       
       #Lexus LS -- Send diagnostic request for cruise control stalk button status every 200ms
       if (self.frame % 20 == 0):
-        can_sends.append(toyotacan.create_ls_dsu_diag_msg(0x02, 0x21, 0x01))
+        can_sends.append(toyotacan.create_ls_dsu_diag_msg(self.packer, 0x02, 0x21, 0x01))
       
       # Lexus LS -- send cruise control button state values from carstate
       if (self.frame % 100 == 0):
