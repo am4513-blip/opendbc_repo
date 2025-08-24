@@ -10,7 +10,7 @@
   {0x790, 2, 8, .check_relay = true}, \
 
 #define LEXUS_LS_BODY_TX_MSGS         \
-  {0x689, 0, 8, .check_relay = true}, \
+  {0x689, 0, 8, .check_relay = false}, \
 
 // Stock longitudinal
 #define TOYOTA_BASE_TX_MSGS \
