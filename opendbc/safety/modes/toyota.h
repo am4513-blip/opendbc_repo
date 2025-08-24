@@ -6,11 +6,11 @@
   {0x180, 0, 5, .check_relay = true}, \
 
 #define LEXUS_LS_DRIVING_TX_MSGS      \
-  {0x280, 0, 8, .check_relay = true}, \  //ACCEL MSG
+  {0x280, 0, 8, .check_relay = true}, \
   {0x790, 2, 8, .check_relay = true}, \
 
 #define LEXUS_LS_BODY_TX_MSGS         \
-  {0x689, 0, 8, .check_relay = true}, \  //CRUISE ACTIVE
+  {0x689, 0, 8, .check_relay = true}, \
 
 // Stock longitudinal
 #define TOYOTA_BASE_TX_MSGS \
