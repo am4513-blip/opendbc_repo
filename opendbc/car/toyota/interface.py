@@ -23,7 +23,7 @@ class CarInterface(CarInterfaceBase):
   @staticmethod
   def _get_params(ret: structs.CarParams, candidate, fingerprint, car_fw, alpha_long, is_release, docs) -> structs.CarParams:
     ret.brand = "toyota"
-    ret.safetyConfigs = [ get_safety_config(structs.CarParams.SafetyModel.toyota, ToyotaSafetyFlags.LEXUS_LS_STEERING_BUS_PANDA.value),
+    ret.safetyConfigs = [ get_safety_config(structs.CarParams.SafetyModel.toyota, 0),
                           get_safety_config(structs.CarParams.SafetyModel.toyota, ToyotaSafetyFlags.LEXUS_LS_DRIVING_BUS_PANDA.value),
                           get_safety_config(structs.CarParams.SafetyModel.toyota, ToyotaSafetyFlags.LEXUS_LS_BODY_BUS_PANDA.value),]
 
@@ -33,6 +33,7 @@ class CarInterface(CarInterfaceBase):
     # BRAKE_MODULE is on a different address for these cars
     if DBC[candidate][Bus.pt] in ["toyota_new_mc_pt_generated", "lexus_ls_new_mc_pt_generated"]:
       ret.safetyConfigs[0].safetyParam |= ToyotaSafetyFlags.ALT_BRAKE.value
+      ret.safetyConfigs[0].safetyParam |= ToyotaSafetyFlags.LEXUS_LS_STEERING_BUS_PANDA.value
 
     if ret.flags & ToyotaFlags.SECOC.value:
       ret.secOcRequired = True
