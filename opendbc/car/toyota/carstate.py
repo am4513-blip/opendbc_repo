@@ -81,7 +81,9 @@ class CarState(CarStateBase):
     ret.seatbeltUnlatched = cp_drv.vl["BODY_CONTROL_STATE"]["SEATBELT_DRIVER_UNLATCHED"] != 0
     ret.parkingBrake = cp_drv.vl["BODY_CONTROL_STATE"]["PARKING_BRAKE"] == 1
 
-    ret.brakePressed = cp_str.vl["BRAKE_MODULE"]["BRAKE_PRESSED"] != 0 
+    ret.brakePressed = cp_str.vl["BRAKE_MODULE"]["BRAKE_PRESSED"] != 0
+    if ret.brakePressed == True:
+      self.cruise_active = False 
     ret.brakeHoldActive = cp_body.vl["ESP_CONTROL"]["BRAKE_HOLD_ACTIVE"] == 1
 
     if self.CP.flags & ToyotaFlags.SECOC.value:
