@@ -90,8 +90,10 @@ class CarController(CarControllerBase):
       acc_enable = 132
       if self.prev_set_speed != CS.cc_set_speed:
         self.pcm_msg_chng = True
+        send_ui = True
       else:
         self.pcm_msg_chng = False
+        send_ui = False
     else:
       acc_enable = 0
 
