@@ -274,14 +274,16 @@ class CarController(CarControllerBase):
         
         
     # *** hud ui ***
+    if self.pcm_msg_chng: ######### LEXUS_LS #########
+      send_ui = True
     # if self.CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
     #   # ui mesg is at 1Hz but we send asap if:
     #   # - there is something to display
     #   # - there is something to stop displaying
     #   send_ui = False
-    #   if ((fcw_alert or steer_alert) and not self.alert_active) or \
-    #      (not (fcw_alert or steer_alert) and self.alert_active):
-    #     send_ui = True
+    # if ((fcw_alert or steer_alert) and not self.alert_active) or \
+    #    (not (fcw_alert or steer_alert) and self.alert_active):
+    #   send_ui = True
     #     self.alert_active = not self.alert_active
     #   elif pcm_cancel_cmd:
     #     # forcing the pcm to disengage causes a bad fault sound so play a good sound instead
@@ -301,7 +303,7 @@ class CarController(CarControllerBase):
         can_sends.append(toyotacan.create_ls_dsu_diag_msg(self.packer, 0x02, 0x21, 0x01))
       
       # Lexus LS -- send cruise control button state values from carstate
-      if (self.frame % 100 == 0):
+      if (self.frame % 100 == 0 or send_ui):
               can_sends.append(toyotacan.create_ls_pcm_cruise_command(self.packer, CS.radar_ready, CS.cruise_active, CS.cc_set_speed))
               self.prev_set_speed = CS.cc_set_speed
 
