@@ -274,8 +274,8 @@ class CarController(CarControllerBase):
         
         
     # *** hud ui ***
-    if self.pcm_msg_chng: ######### LEXUS_LS #########
-      send_ui = True
+    # if self.pcm_msg_chng: ######### LEXUS_LS #########
+    #   send_ui = True
     # if self.CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
     #   # ui mesg is at 1Hz but we send asap if:
     #   # - there is something to display
