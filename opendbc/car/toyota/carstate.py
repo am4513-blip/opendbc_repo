@@ -358,7 +358,8 @@ class CarState(CarStateBase):
                       ("LIGHT_STALK", 1),           #0x622 from Driving BUS
                       ("VSC_DATA7", 21),]           #0x320 from Driving BUS
     
-    body_messages = [ ("ESP_CONTROL", 3),]          #0x3B7 Gatewayed from Body BUS
+    body_messages = [ ("ESP_CONTROL", 3),           #0x3B7 Gatewayed from Body BUS
+                      ("CRUISE_DISTANCE", 1),]      #0x6D8 Gatewayed from Body BUS
     
     dsu_drv_messages = [("DSU_DIAG_RESP_MSG", 5),]  #0x798 Diag Resp Msg From DSU on Driving BUS
     
