@@ -280,7 +280,7 @@ class CarState(CarStateBase):
     #if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR):
       # distance button is wired to the ACC module (camera or radar)
     prev_distance_button = self.distance_button
-    self.distance_button = cp_alt.vl["CRUISE_DISTANCE"]["CRS_DIST_BUT_STAT"]
+    self.distance_button = cp_body.vl["CRUISE_DISTANCE"]["CRS_DIST_BUT_STAT"]
 
     ret.buttonEvents = create_button_events(self.distance_button, prev_distance_button, {1: ButtonType.gapAdjustCruise})
 
