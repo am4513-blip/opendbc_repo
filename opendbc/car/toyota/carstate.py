@@ -40,8 +40,11 @@ class CarState(CarStateBase):
     self.cc_main_sw_prev_st = False
     self.cc_res_acc_sw_prev_st = False
     self.cc_set_coast_sw_prev_st = False
+    self.cc_follw_dist_prev_st = False
     self.cc_set_speed = 25  #default cruise set speed when first activated
     self.cc_first_act = False   #when false, cc has not been activated previously. set to false when MAIN is turned OFF
+    #self.dsu_follow_distance = 0
+    
 
     if CP.flags & ToyotaFlags.SECOC.value:
       self.shifter_values = can_define.dv["GEAR_PACKET_HYBRID"]["GEAR"]
@@ -73,8 +76,8 @@ class CarState(CarStateBase):
     ret = structs.CarState()
     #cp_acc = cp_cam if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR) else cp
 
-    # if not self.CP.flags & ToyotaFlags.SECOC.value:
-    #   self.gvc = cp.vl["VSC1S07"]["GVC"]
+    if not self.CP.flags & ToyotaFlags.SECOC.value:
+     self.gvc = cp_drv.vl["VSC_DATA7"]["GVC"]
 
     ret.doorOpen = any([cp_drv.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FL"], cp_drv.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FR"],
                         cp_drv.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_RL"], cp_drv.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_RR"]])
@@ -217,12 +220,22 @@ class CarState(CarStateBase):
           self.cc_set_speed = (  round(((ret.wheelSpeeds.fl * CV.MS_TO_MPH) + 5)/5) * 5.0) #(round((ret.vEgoRaw * 0.6213712) / 5.0) * 5.0)  # round to the nearest 5,  1kmh =  0.6213712 mph
           self.cc_first_act = True
           self.cruise_active = True
-
+    
+    ## Check DIST_CNTRL Button Status
+    # elif cp_dsu_drv.vl["DSU_DIAG_RESP_MSG"]["CC_FOLLOW_DIST_STAT"] == 1:
+    #   if self.cc_follw_dist_prev_st == False:
+    #     self.dsu_follow_distance += 1
+    #     if self.dsu_follow_distance >= 4:
+    #       self.dsu_follow_distance = 1
+        
           
     else:
       self.cc_main_sw_prev_st = False
       self.cc_set_coast_sw_prev_st = False
       self.cc_res_acc_sw_prev_st = False
+      #self.cc_follw_dist_prev_st = False
+      
+
 
     # UI_SET_SPEED is always non-zero when main is on, hide until first enable
     if ret.cruiseState.speed != 0:
@@ -261,15 +274,15 @@ class CarState(CarStateBase):
     # if self.CP.carFingerprint != CAR.TOYOTA_PRIUS_V:
     #   self.lkas_hud = copy.copy(cp_cam.vl["LKAS_HUD"])
 
-    if self.CP.carFingerprint not in UNSUPPORTED_DSU_CAR:
-      self.pcm_follow_distance = 1 #cp_body.vl["PCM_CRUISE_2"]["PCM_FOLLOW_DISTANCE"]
+    # if self.CP.carFingerprint not in UNSUPPORTED_DSU_CAR:
+    #self.pcm_follow_distance = cp_alt.vl["PCM_CRUISE"]["FOLLOW_DISTANCE"]
 
-    if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR):
+    #if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR):
       # distance button is wired to the ACC module (camera or radar)
-      prev_distance_button = self.distance_button
-      self.distance_button = 1 #cp_acc.vl["ACC_CONTROL"]["DISTANCE"]
+    prev_distance_button = self.distance_button
+    self.distance_button = cp_alt.vl["CRUISE_DISTANCE"]["CRS_DIST_BUT_STAT"]
 
-      ret.buttonEvents = create_button_events(self.distance_button, prev_distance_button, {1: ButtonType.gapAdjustCruise})
+    ret.buttonEvents = create_button_events(self.distance_button, prev_distance_button, {1: ButtonType.gapAdjustCruise})
 
     return ret
 
