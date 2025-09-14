@@ -237,7 +237,7 @@ static bool toyota_tx_hook(const CANPacket_t *to_send) {
   const TorqueSteeringLimits TOYOTA_TORQUE_STEERING_LIMITS = {
     .max_torque = 1100,
     .max_rate_up = 10,          // ramp up slow
-    .max_rate_down = 10,        // ramp down fast
+    .max_rate_down = 15,        // ramp down fast
     .max_torque_error = 350,    // max torque cmd in excess of motor torque
     .max_rt_delta = 450,        // the real time limit is 1800/sec, a 20% buffer
     .type = TorqueMotorLimited,
