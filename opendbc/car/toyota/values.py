@@ -400,7 +400,7 @@ class CAR(Platforms):
   )
   LEXUS_LS = PlatformConfig(
     [ToyotaCarDocs("Lexus GS F 2016")],
-    CarSpecs(mass=4250. * CV.LB_TO_KG, wheelbase=3.09, steerRatio=15.0, tireStiffnessFactor=0.55),
+    CarSpecs(mass=4250. * CV.LB_TO_KG, wheelbase=3.09, steerRatio=15.0, tireStiffnessFactor=0.75),
     dbc_dict('lexus_ls_new_mc_pt_generated', 'lexus_ls_adas'),
     flags=ToyotaFlags.NO_STOP_TIMER | ToyotaFlags.SNG_WITHOUT_DSU | ToyotaFlags.NO_STOP_TIMER | ToyotaFlags.RAISED_ACCEL_LIMIT
   )

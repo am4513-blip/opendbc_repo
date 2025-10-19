@@ -22,11 +22,13 @@ def create_ls_accel_command(packer, accel, fcw_alert, acc_enable):
   }
   return packer.make_can_msg("ACC_COMMAND", 4, values)
 
-def create_ls_pcm_cruise_command(packer, radar_ready, cruise_active, ui_set_speed):
+def create_ls_pcm_cruise_command(packer, radar_ready, cruise_active, ui_set_speed, follow_distance, radar_crs_stndby_stat):
   values = {
     "CRUISE_ACTIVE": cruise_active,
     "RADAR_READY":   radar_ready,
     "UI_SET_SPEED":  ui_set_speed,
+    "FOLLOW_DISTANCE": follow_distance,
+    "RADAR_CRS_STNDBY_STAT": radar_crs_stndby_stat,
   }
   return packer.make_can_msg("PCM_CRUISE", 8, values)  #send on CAN 0 of 3rd Panda (CAN8)
 
