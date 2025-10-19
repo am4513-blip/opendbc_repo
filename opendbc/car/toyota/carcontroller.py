@@ -252,7 +252,7 @@ class CarController(CarControllerBase):
 
         # can_sends.append(toyotacan.create_accel_command(self.packer, pcm_accel_cmd, pcm_cancel_cmd, self.permit_braking, self.standstill_req, lead,
         #                                                 CS.acc_type, fcw_alert, self.distance_button))
-        can_sends.append(toyotacan.create_ls_accel_command(self.packer, pcm_accel_cmd, fcw_alert, acc_enable, distance,  ))
+        can_sends.append(toyotacan.create_ls_accel_command(self.packer, pcm_accel_cmd, fcw_alert, acc_enable))
         self.accel = pcm_accel_cmd
 
     # else:
