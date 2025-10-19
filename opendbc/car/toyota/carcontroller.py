@@ -252,7 +252,7 @@ class CarController(CarControllerBase):
 
         # can_sends.append(toyotacan.create_accel_command(self.packer, pcm_accel_cmd, pcm_cancel_cmd, self.permit_braking, self.standstill_req, lead,
         #                                                 CS.acc_type, fcw_alert, self.distance_button))
-        can_sends.append(toyotacan.create_ls_accel_command(self.packer, pcm_accel_cmd, fcw_alert, acc_enable))
+        can_sends.append(toyotacan.create_ls_accel_command(self.packer, pcm_accel_cmd, fcw_alert, acc_enable, distance,  ))
         self.accel = pcm_accel_cmd
 
     # else:
@@ -307,7 +307,7 @@ class CarController(CarControllerBase):
       
     # Lexus LS -- send cruise control button state values from carstate every 500ms
     if ((self.frame % 50 == 0) or (self.pcm_msg_chng)):
-      can_sends.append(toyotacan.create_ls_pcm_cruise_command(self.packer, CS.radar_ready, CS.cruise_active, CS.cc_set_speed))
+      can_sends.append(toyotacan.create_ls_pcm_cruise_command(self.packer, CS.radar_ready, CS.cruise_active, CS.cc_set_speed, 1, 1))
       self.prev_set_speed = CS.cc_set_speed
 
     # *** static msgs ***
