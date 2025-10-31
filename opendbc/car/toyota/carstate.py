@@ -255,8 +255,7 @@ class CarState(CarStateBase):
        (self.CP.carFingerprint in TSS2_CAR and self.acc_type == 1):
       if self.CP.openpilotLongitudinalControl:
         #ret.accFaulted = ret.accFaulted or cp.vl["PCM_CRUISE_2"]["LOW_SPEED_LOCKOUT"] == 2
-        mask = 0xFB #Mask out checking for VGRS fault as test.
-        ret.accFaulted= ((cp_drv.vl["VSC_DATA7"]["BRK_ERR_FLGS"]) & 0xFB) != 0  ############### LEXUS_LS ########################
+        ret.accFaulted= ((cp_drv.vl["VSC_DATA7"]["BRK_ERR_FLGS"]) & 251) != 0  ############### LEXUS_LS ########################
 
     self.pcm_acc_status = 8 #cp.vl["PCM_CRUISE"]["CRUISE_STATE"]   ############### LEXUS_LS ########################
     if self.CP.carFingerprint not in (NO_STOP_TIMER_CAR - TSS2_CAR):
