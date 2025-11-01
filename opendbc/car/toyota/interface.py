@@ -48,7 +48,7 @@ class CarInterface(CarInterfaceBase):
       ret.steerActuatorDelay = 0.18
       ret.steerLimitTimer = 0.8
     else:
-      CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning, steering_angle_deadzone_deg = 0.6)
+      CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning, steering_angle_deadzone_deg = 0.0)
       ret.steerActuatorDelay = 0.12  # Default delay, Prius has larger delay
       ret.steerLimitTimer = 0.4
 
